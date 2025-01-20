@@ -15,6 +15,13 @@ const initialState: UserState = {
     loading: false,
     error: null,
 };
+
+interface LoginForm {
+    identifier: string; // email or phone
+    password: string;
+}
+
+
 // Register
 export const registerUser = createAsyncThunk('/auth/register',
     async (formData) => {
@@ -33,17 +40,28 @@ export const registerUser = createAsyncThunk('/auth/register',
 
 
 //login
-export const loginUser = createAsyncThunk('/auth/login',
-    async (formdata) => {
-        const response = await axios.post("http://localhost:5001/auth/login",
-            formdata,
-            {
-                withCredentials: true
-            }
-        )
-        return response.data;
+export const loginUser = createAsyncThunk(
+    '/auth/login',
+    async (formData: LoginForm, { rejectWithValue }) => {
+        try {
+            const payload = formData.identifier.includes("@")
+                ? { email: formData.identifier, password: formData.password } // If identifier contains "@", treat as email
+                : { phoneNumber: formData.identifier, password: formData.password }; // Otherwise, treat as phone number
+
+            const response = await axios.post(
+                "http://localhost:5001/auth/login",
+                payload,
+                { withCredentials: true }
+            );
+
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.response?.data?.error || "Invalid credentials"
+            );
+        }
     }
-)
+);
 
 const authSlice = createSlice({
     name: "auth",
@@ -55,13 +73,24 @@ const authSlice = createSlice({
                 state.loading = true;
             })
             .addCase(registerUser.fulfilled, (state, action) => {
-                console.log("action",action.payload);
                 state.loading = false;
                 state.user = action.payload;
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message || "registration failed";
+            })
+            .addCase(loginUser.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(loginUser.fulfilled, (state, action) => {
+                console.log("action",action.payload);
+                state.loading = false;
+                state.user = action.payload;
+            })
+            .addCase(loginUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "login failed";
             });
     }
 });

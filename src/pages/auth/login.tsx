@@ -9,7 +9,7 @@ function Login() {
 
     // State to hold form data and errors
     const [formData, setFormData] = useState({
-        identifier: "", // Single field for email/phone
+        identifier: "", // This will be email or phone
         password: "",
     });
     const [error, setError] = useState("");
@@ -25,23 +25,28 @@ function Login() {
         e.preventDefault();
         setError(""); // Clear previous errors
 
+        // Validation
         if (!formData.identifier || !formData.password) {
             setError("Please fill in both fields.");
             return;
         }
 
         try {
-            const response = await dispatch(loginUser(formData)).unwrap(); // Handle async Thunk response
+            const response = await dispatch(
+                loginUser({
+                    identifier: formData.identifier,
+                    password: formData.password,
+                })
+            ).unwrap();
+
             console.log("Login successful:", response);
+            
+            navigate("/home");
+
         } catch (err: any) {
             console.error("Login failed:", err);
-            setError(err.message || "Login failed. Please try again.");
+            setError(err || "Login failed. Please try again.");
         }
-
-        console.log(formData);
-        alert("Login Successfull");
-        navigate("/home");
-        
     };
 
     return (
