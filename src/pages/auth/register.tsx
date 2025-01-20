@@ -1,9 +1,10 @@
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../store/authSlice";
 import { useState } from "react";
 
 function Register() {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         userName: "",
@@ -56,6 +57,9 @@ function Register() {
             if (value) form.append(key, value as string | Blob);
         });
         dispatch(registerUser(form));
+
+        alert("Registration Successfull");
+        navigate("/auth/login");
     };
 
     console.log("formdata",formData);

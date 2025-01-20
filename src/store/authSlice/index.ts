@@ -17,9 +17,9 @@ const initialState: UserState = {
 };
 // Register
 export const registerUser = createAsyncThunk('/auth/register',
-    async (formdata) => {
+    async (formData) => {
         const response = await axios.post('http://localhost:5001/auth/register',
-            formdata,
+            formData,
             {
                 withCredentials: true,
                 headers : {
@@ -31,6 +31,20 @@ export const registerUser = createAsyncThunk('/auth/register',
     }
 );
 
+
+//login
+export const loginUser = createAsyncThunk('/auth/login',
+    async (formdata) => {
+        const response = await axios.post("http://localhost:5001/auth/login",
+            formdata,
+            {
+                withCredentials: true
+            }
+        )
+        return response.data;
+    }
+)
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -41,6 +55,7 @@ const authSlice = createSlice({
                 state.loading = true;
             })
             .addCase(registerUser.fulfilled, (state, action) => {
+                console.log("action",action.payload);
                 state.loading = false;
                 state.user = action.payload;
             })
