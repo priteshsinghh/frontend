@@ -1,27 +1,32 @@
-import { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../store/authSlice";
 
-function Login() {
+interface FormData {
+    identifier: string;
+    password: string;
+}
+
+const Login: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     // State to hold form data and errors
-    const [formData, setFormData] = useState({
-        identifier: "", // This will be email or phone
+    const [formData, setFormData] = useState<FormData>({
+        identifier: "",
         password: "",
     });
-    const [error, setError] = useState("");
+    const [error, setError] = useState<string>("");
 
     // Handle input changes
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
     // Handle form submission
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError(""); // Clear previous errors
 
@@ -61,7 +66,7 @@ function Login() {
                             htmlFor="identifier"
                             className="block text-sm font-medium text-black mb-1"
                         >
-                            Email or Phone Number: 
+                            Email or Phone Number:
                         </label>
                         <input
                             type="text"
@@ -117,6 +122,6 @@ function Login() {
             </div>
         </div>
     );
-}
+};
 
 export default Login;
