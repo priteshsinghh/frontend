@@ -12,6 +12,7 @@ function Register() {
         email: "",
         phoneNumber: "",
         gender: "",
+        userRole: "",
         password: "",
         profilePic: null,
     });
@@ -23,6 +24,7 @@ function Register() {
         if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = "Valid email is required.";
         if (!formData.phoneNumber) newErrors.phoneNumber = "Phone number is required.";
         if (!formData.gender) newErrors.gender = "Gender selection is required.";
+        if (!formData.userRole) newErrors.gender = "role selection is required.";
         if (!formData.password || formData.password.length < 6)
             newErrors.password = "Password must be at least 6 characters.";
         if (formData.profilePic && formData.profilePic.size > 5 * 1024 * 1024)
@@ -63,8 +65,8 @@ function Register() {
         navigate("/auth/login");
     };
 
-    console.log("formdata",formData);
-    
+    console.log("formdata", formData);
+
 
     return (
         <div className="min-h-screen flex items-center justify-center">
@@ -157,6 +159,30 @@ function Register() {
                             ))}
                         </div>
                     </div>
+
+                    {/* userrole */}
+                    <div className="mb-4">
+                        <label
+                            htmlFor="userRole"
+                            className="block text-sm font-medium text-black mb-1"
+                        >
+                            Select Role:
+                        </label>
+                        <select
+                            id="userRole"
+                            name="userRole"
+                            value={formData.userRole}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        >
+                            <option value="" disabled>
+                                Choose your role
+                            </option>
+                            <option value="seller">Seller</option>
+                            <option value="buyer">Buyer</option>
+                        </select>
+                    </div>
+
 
                     {/* File Upload */}
                     <div className="mb-4">

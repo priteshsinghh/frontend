@@ -46,7 +46,7 @@ const Login: React.FC = () => {
 
             console.log("Login successful:", response);
             
-            navigate("/shop/home");
+            // navigate("/shop/home");
 
         } catch (err: any) {
             console.error("Login failed:", err);

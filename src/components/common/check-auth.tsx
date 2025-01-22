@@ -3,23 +3,35 @@ import { Navigate, useLocation } from "react-router-dom";
 
 interface CheckAuthProps {
   isAuthenticated: boolean;
+  user: any;
   children: ReactNode;
 }
 
-const CheckAuth: React.FC<CheckAuthProps> = ({ isAuthenticated, children }) => {
+const CheckAuth: React.FC<CheckAuthProps> = ({ isAuthenticated, children, user }) => {
   const location = useLocation();
 
-  // Redirect unauthenticated users accessing protected routes to login
-  if (!isAuthenticated && location.pathname.startsWith("/shop")) {
-    return <Navigate to="/auth/login" replace />;
+
+  if (!isAuthenticated) {
+    if (location.pathname.startsWith("/shop") || location.pathname.startsWith("/admin")) {
+      return <Navigate to="/auth/login" replace />;
+    }
   }
 
-  // Redirect authenticated users away from auth pages to /shop/home
-  if (isAuthenticated && location.pathname.startsWith("/auth")) {
-    return <Navigate to="/shop/home" replace />;
+  if (isAuthenticated) {
+    if (location.pathname.startsWith("/auth")) {
+      if (user?.userRole === "seller") {
+        return <Navigate to="/admin/dashboard" replace />;
+      } else {
+        console.log("Redirecting authenticated user to shop home...");
+        return <Navigate to="/shop/home" replace />;
+      }
+    }
+
+    if (location.pathname.startsWith("/admin") && user?.userRole !== "seller") {
+      return <Navigate to="/shop/home" replace />;
+    }
   }
 
-  // Render children if no redirection is needed
   return <>{children}</>;
 };
 

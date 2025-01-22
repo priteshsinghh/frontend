@@ -10,12 +10,16 @@ import { checkAuth } from './store/authSlice';
 import CheckAuth from './components/common/check-auth';
 import ShoppingLayout from './components/home/layout';
 import NotFound from './pages/not-found';
-import Home from './pages/auth/home/home';
+import Home from './pages/home/home';
 import { RootState, AppDispatch } from './store/store'; // Import RootState and AppDispatch types
+import AdminLayout from './components/admin/layout';
+import AdminDashboard from './pages/admin/dashboard';
+import AdminProducts from './pages/admin/products';
+import AdminOrder from './pages/admin/orders';
 
 const App: React.FC = () => {
   // Use RootState for the state type
-  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
 
   // Use AppDispatch for the dispatch type
   const dispatch: AppDispatch = useDispatch();
@@ -29,12 +33,26 @@ const App: React.FC = () => {
   return (
     <>
       <Routes>
+
+
+
+      <Route
+          path="/"
+          element={
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+              <AuthLayout />
+            </CheckAuth>
+          }
+        >
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+        </Route>
         {/* Auth Routes */}
 
         <Route
-          path="/auth/*"
+          path="/auth"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated}>
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
               <AuthLayout />
             </CheckAuth>
           }
@@ -43,11 +61,25 @@ const App: React.FC = () => {
           <Route path="register" element={<Register />} />
         </Route>
 
+
+        <Route path="/admin" element={
+          <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+            <AdminLayout />
+          </CheckAuth>
+        }>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrder />} />
+          
+        </Route>
+
+
+
         {/* Protected Routes */}
         <Route
-          path="/shop/*"
+          path="/shop"
           element={
-            <CheckAuth isAuthenticated={isAuthenticated}>
+            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
               <ShoppingLayout />
             </CheckAuth>
           }
