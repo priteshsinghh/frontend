@@ -83,10 +83,7 @@ const Footer: React.FC = () => {
 
         <div className="mt-8 text-center border-t border-gray-700 pt-4">
           <p className="text-gray-400 text-sm">
-            Like-themes © All Rights Reserved - 2019 -{" "}
-            <a href="#" className="text-green-500 hover:text-green-400">
-              Purchase
-            </a>
+            StayFit © All Rights Reserved - 2025
           </p>
         </div>
       </div>

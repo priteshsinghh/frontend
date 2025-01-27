@@ -61,7 +61,7 @@ function Register() {
         });
         dispatch(registerUser(form));
 
-        alert("Registration Successfull");
+        // alert("Registration Successfull");
         navigate("/auth/login");
     };
 
