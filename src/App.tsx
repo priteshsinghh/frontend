@@ -16,7 +16,9 @@ import AdminLayout from './components/admin/layout';
 import AdminDashboard from './pages/admin/dashboard';
 import AdminProducts from './pages/admin/products';
 import AdminOrder from './pages/admin/orders';
-import EmailVerification from './pages/verify-email/verified-email';
+import EmailVerification from './pages/auth/verified-email';
+import ResetPassword from './pages/auth/reset-password';
+import ForgetPassword from './pages/auth/forget-password';
 
 const App: React.FC = () => {
   // Use RootState for the state type
@@ -45,7 +47,6 @@ const App: React.FC = () => {
     <>
       <Routes>
 
-
         <Route
           path="/"
           element={
@@ -54,7 +55,6 @@ const App: React.FC = () => {
             </CheckAuth>
           }
         >
-
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>
@@ -69,6 +69,8 @@ const App: React.FC = () => {
           }
         >
           <Route path="mail-verification" element={<EmailVerification />} />
+          <Route path="reset-password" element={<ResetPassword />} />
+          <Route path="forget-password" element={<ForgetPassword />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
         </Route>

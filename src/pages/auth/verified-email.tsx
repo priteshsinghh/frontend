@@ -22,8 +22,8 @@ const EmailVerification: React.FC = () => {
         );
 
         if (response.data.success) {
-          setVerificationStatus("User verified successfully! Redirecting to login...");
-        //   setTimeout(() => navigate("/login"), 3000); // Redirect to login after 3 seconds
+          setVerificationStatus("User verified successfully! Click to login...");
+        //   setTimeout(() => navigate("/auth/login"), 3000); // Redirect to login after 3 seconds
         } else {
           setVerificationStatus("Verification failed. Invalid token or phone number.");
         }

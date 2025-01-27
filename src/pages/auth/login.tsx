@@ -111,12 +111,19 @@ const Login: React.FC = () => {
                     </button>
 
                     {/* Register Link */}
-                    <div className="mt-4 text-center">
-                        <p className="text-md text-black">Don’t have an account?</p>
-                        <Link to="/auth/register" className="text-blue-500 hover:underline">
+                    <div className="mt-4 text-center flex flex-col">
+                        <p className="text-md text-black">Don’t have an account? </p>
+                        <Link to="/auth/register" className="text-blue-700 hover:underline">
                             Register
                         </Link>
+                    
+                        <p className="text-md text-black">Forget your Password? </p>
+                        <Link to="/auth/forget-password" className="text-blue-700 hover:underline">
+                            Forget Password
+                        </Link>
                     </div>
+
+                    
                 </form>
             </div>
         </div>
