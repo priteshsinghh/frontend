@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
@@ -44,28 +44,52 @@ export const registerUser = createAsyncThunk('/auth/register',
 
 
 //login
-export const loginUser = createAsyncThunk(
-    '/auth/login',
-    async (formData: LoginForm, { rejectWithValue }) => {
-        try {
-            const payload = formData.identifier.includes("@")
-                ? { email: formData.identifier, password: formData.password } // If identifier contains "@", treat as email
-                : { phoneNumber: formData.identifier, password: formData.password }; // Otherwise, treat as phone number
+// export const loginUser = createAsyncThunk(
+//     '/auth/login',
+//     async (formData: LoginForm) => {
+//         try {
+//             const payload = formData.identifier.includes("@")
+//                 ? { email: formData.identifier, password: formData.password } // If identifier contains "@", treat as email
+//                 : { phoneNumber: formData.identifier, password: formData.password }; // Otherwise, treat as phone number
 
-            const response = await axios.post(
-                "http://localhost:5001/auth/login",
-                payload,
-                { withCredentials: true }
-            );
+//             const response = await axios.post(
+//                 "http://localhost:5001/auth/login",
+//                 payload,
+//                 { withCredentials: true }
+//             );
 
-            return response.data;
-        } catch (error: any) {
-            return rejectWithValue(
-                error.response?.data?.error || "Invalid credentials"
-            );
-        }
-    }
-);
+//             console.log(response);
+
+//             if (response.data.status === "ok" && response.data.data) {
+//                 const token = response.data.data.token;
+//                 const userRole = response.data.data.userRole;
+
+//                 console.log("token and userrole", token, userRole);
+
+//                 localStorage.setItem("token", token);
+//                 localStorage.setItem("userRole", userRole);
+//                 localStorage.setItem("islogin", JSON.stringify(true));
+
+//                 // if (userRole === "seller") {
+//                 //     return (window.location.href = "./admin/dashboard");
+//                 // } else {
+//                 //     window.location.href = "./shop/home";
+//                 // }
+
+//             } else {
+//                 console.error("Login failed:", response.data.error);
+//                 alert(response.data.error || "Login failed. Please try again.");
+//             }
+//         } catch (error) {
+//             console.error("An error occurred during login:", error);
+//             alert("An error occurred. Please try again later.");
+//         }
+
+//     }
+// );
+
+
+
 
 
 //logout 
@@ -123,20 +147,20 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.error = action.error.message || "registration failed";
             })
-            .addCase(loginUser.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(loginUser.fulfilled, (state, action) => {
+            // .addCase(loginUser.pending, (state) => {
+            //     state.loading = true;
+            // })
+            // .addCase(loginUser.fulfilled, (state, action) => {
 
-                state.loading = false;
-                state.user = action.payload.success ? action.payload.user : null;
-                state.isAuthenticated = action.payload.success;
-            })
-            .addCase(loginUser.rejected, (state, action) => {
-                state.loading = false;
-                state.user = null;
-                state.error = action.error.message || "login failed";
-            })
+            //     state.loading = false;
+            //     state.user = action.payload.success ? action.payload.user : null;
+            //     state.isAuthenticated = action.payload.success;
+            // })
+            // .addCase(loginUser.rejected, (state, action) => {
+            //     state.loading = false;
+            //     state.user = null;
+            //     state.error = action.error.message || "login failed";
+            // })
             // .addCase(checkAuth.pending, (state) => {
             //     state.loading = true;
             // })

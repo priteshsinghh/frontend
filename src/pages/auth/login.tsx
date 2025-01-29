@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../store/authSlice";
+import axios from "axios";
 
 interface FormData {
     identifier: string;
@@ -9,62 +9,74 @@ interface FormData {
 }
 
 const Login: React.FC = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // State to hold form data and errors
-    const [formData, setFormData] = useState<FormData>({
-        identifier: "",
-        password: "",
-    });
+    // State for form data, errors, and loading
+    const [formData, setFormData] = useState<FormData>({ identifier: "", password: "" });
     const [error, setError] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
 
     // Handle input changes
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
     // Handle form submission
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setError(""); // Clear previous errors
+        setLoading(true); // Set loading state
 
         // Validation
         if (!formData.identifier || !formData.password) {
-            setError("Please fill in both fields.");
+            setError("Email/Phone and Password are required.");
+            setLoading(false);
             return;
         }
 
         try {
-            const response = await dispatch(
-                loginUser({
-                    identifier: formData.identifier,
-                    password: formData.password,
-                })
-            ).unwrap();
+            const payload = formData.identifier.includes("@")
+                ? { email: formData.identifier, password: formData.password }
+                : { phoneNumber: formData.identifier, password: formData.password };
 
-            console.log("Login successful:", response);
-            
+            const response = await axios.post("http://localhost:5001/auth/login", payload, {
+                withCredentials: true,
+            });
 
-        } catch (err: any) {
-            console.error("Login failed:", err);
-            setError(err || "Login failed. Please try again.");
+            if (response.data.status === "ok" && response.data.data) {
+                const { token, userRole } = response.data.data;
+
+                // Store in localStorage
+                localStorage.setItem("token", token);
+                localStorage.setItem("userRole", userRole);
+                localStorage.setItem("islogin", JSON.stringify(true));
+
+                // Navigate based on role
+                if (userRole === "seller") {
+                    navigate("/admin/dashboard");
+                } else {
+                    navigate("/shop/home");
+                }
+            } else {
+                setError(response.data.error || "Login failed. Please try again.");
+            }
+        } catch (error: any) {
+            console.error("Login error:", error);
+            setError(error.response?.data?.error || "An error occurred. Please try again.");
+        } finally {
+            setLoading(false); // Reset loading state
         }
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center">
-            {/* Blur Container */}
             <div className="w-full max-w-md p-8 bg-white bg-opacity-30 backdrop-blur-lg rounded-xl shadow-lg">
                 <h2 className="text-3xl font-bold text-center mb-6 text-black">Login</h2>
                 <form onSubmit={handleSubmit}>
                     {/* Identifier Input (Email/Phone) */}
                     <div className="mb-4">
-                        <label
-                            htmlFor="identifier"
-                            className="block text-sm font-medium text-black mb-1"
-                        >
+                        <label htmlFor="identifier" className="block text-sm font-medium text-black mb-1">
                             Email or Phone Number:
                         </label>
                         <input
@@ -80,10 +92,7 @@ const Login: React.FC = () => {
 
                     {/* Password Input */}
                     <div className="mb-6">
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-black mb-1"
-                        >
+                        <label htmlFor="password" className="block text-sm font-medium text-black mb-1">
                             Password:
                         </label>
                         <input
@@ -98,32 +107,31 @@ const Login: React.FC = () => {
                     </div>
 
                     {/* Error Message */}
-                    {error && (
-                        <p className="mb-4 text-sm text-red-500 text-center">{error}</p>
-                    )}
+                    {error && <p className="mb-4 text-sm text-red-500 text-center">{error}</p>}
 
                     {/* Login Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition duration-300"
+                        disabled={loading}
+                        className={`w-full text-white py-2 rounded-md transition duration-300 ${
+                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg"
+                        }`}
                     >
-                        Login
+                        {loading ? "Logging in..." : "Login"}
                     </button>
 
-                    {/* Register Link */}
+                    {/* Register & Forgot Password Links */}
                     <div className="mt-4 text-center flex flex-col">
                         <p className="text-md text-black">Don’t have an account? </p>
                         <Link to="/auth/register" className="text-blue-700 hover:underline">
                             Register
                         </Link>
-                    
-                        <p className="text-md text-black">Forget your Password? </p>
+
+                        <p className="text-md text-black">Forgot your Password? </p>
                         <Link to="/auth/forget-password" className="text-blue-700 hover:underline">
-                            Forget Password
+                            Reset Password
                         </Link>
                     </div>
-
-                    
                 </form>
             </div>
         </div>

@@ -1,6 +1,5 @@
-
 import React from "react";
-import { useRoutes } from "react-router-dom";
+import { useRoutes, Navigate } from "react-router-dom";
 import AuthLayout from "../components/auth/layout";
 import Login from "../pages/auth/login";
 import Register from "../pages/auth/register";
@@ -12,59 +11,56 @@ import AdminProducts from "../pages/admin/products";
 import AdminOrder from "../pages/admin/orders";
 import Home from "../pages/home/home";
 import NotFound from "../pages/not-found";
-import AdminLayout from "../components/admin/layout";
 import ShoppingLayout from "../components/home/layout";
+import ProtectedRoute from "../components/common/protectedRoute";
 
 const Router: React.FC = () => {
-
-    
+    const isLogin = localStorage.getItem("islogin") === "true";
+    const userRole = localStorage.getItem("userRole");
 
     const routes = useRoutes([
         {
-            path: '/',
-            element: <ShoppingLayout />
+            path: "/",
+            element: <ShoppingLayout />,
+            children: [{ path: "home", element: <Home /> }],
         },
         {
             path: "/auth",
-            element: 
-                <AuthLayout />,
-            
-        
+            element: isLogin ? (
+                
+                userRole === "seller" ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/shop/home" replace />
+            ) : (
+                <AuthLayout />
+            ),
             children: [
-                { path: 'login', element: <Login /> },
-                { path: 'register', element: <Register /> },
-                { path: 'mail-verification', element: <EmailVerification /> },
-                { path: 'forget-password', element: <ForgetPassword /> },
-                { path: 'reset-password', element: <ResetPassword /> }
+                { path: "login", element: <Login /> },
+                { path: "register", element: <Register /> },
+                { path: "mail-verification", element: <EmailVerification /> },
+                { path: "forget-password", element: <ForgetPassword /> },
+                { path: "reset-password", element: <ResetPassword /> },
             ],
         },
         {
             path: "/admin",
-            element: <AdminLayout/>,
+            element: <ProtectedRoute allowedRoles={["seller"]}/>,
             children: [
-                { path: 'dashboard', element: <AdminDashboard /> },
-                { path: 'products', element: <AdminProducts /> },
-                { path: 'orders', element: <AdminOrder /> },
+                { path: "dashboard", element: <AdminDashboard /> },
+                { path: "products", element: <AdminProducts /> },
+                { path: "orders", element: <AdminOrder /> },
             ],
         },
         {
             path: "/shop",
-            element: <ShoppingLayout/>,
-            children: [
-                { path: 'home', element: <Home /> },
-            ],
+            element: <ProtectedRoute allowedRoles={["buyer"]} />,
+            children: [{ path: "home", element: <Home /> }],
         },
-
         {
-            path: '*',
-            element: <NotFound />
+            path: "*",
+            element: <NotFound />,
         },
-
     ]);
 
     return routes;
-
-}
-
+};
 
 export default Router;

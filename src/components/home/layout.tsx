@@ -1,15 +1,16 @@
 // import { Outlet } from "react-router-dom";
 import Header from "./header";
 import Footer from "./footer";
-import Home from "../../pages/home/home";
+import { Outlet } from "react-router-dom";
 
 function ShoppingLayout()  {
   return (
     <div className="flex flex-col bg-white overflow-hidden">
       {/* common header */}
-      <Header/>
+      
       <div className="flex flex-col w-full">
-        <Home/>
+      <Header/>
+        <Outlet/>
       </div>
       <Footer/>
     </div>
