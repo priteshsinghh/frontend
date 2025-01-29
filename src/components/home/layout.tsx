@@ -1,6 +1,7 @@
-import { Outlet } from "react-router-dom";
+// import { Outlet } from "react-router-dom";
 import Header from "./header";
 import Footer from "./footer";
+import Home from "../../pages/home/home";
 
 function ShoppingLayout()  {
   return (
@@ -8,7 +9,7 @@ function ShoppingLayout()  {
       {/* common header */}
       <Header/>
       <div className="flex flex-col w-full">
-        <Outlet/>
+        <Home/>
       </div>
       <Footer/>
     </div>
