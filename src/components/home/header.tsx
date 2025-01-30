@@ -1,13 +1,15 @@
 import { User2Icon } from 'lucide-react';
 import React from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logoutUser } from '../../store/authSlice';
+
 
 const Header: React.FC = () => {
 
+  const isLogin = localStorage.getItem("islogin")
+  console.log(isLogin);
+  
+
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     function handleLogout(){
       localStorage.clear();
@@ -15,6 +17,7 @@ const Header: React.FC = () => {
     }
 
     function handleLogin(){
+
         navigate("/auth/login");
     }
 
@@ -72,7 +75,7 @@ const Header: React.FC = () => {
 
       {/* Get Menu Button */}
       
-      <button className="flex gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-red-500" onClick={handleLogin}>
+      <button className= "flex gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-red-500" onClick={handleLogin} disabled={true}>
         <User2Icon/> Login/SignUp
       </button>
       <button className='flex gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-red-500' onClick={handleLogout}>Logout</button>

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
+import { forgetPassword } from "../../APIs/api";
 
 const ForgetPassword: React.FC = () => {
     const [email, setEmail] = useState("");
@@ -14,18 +14,13 @@ const ForgetPassword: React.FC = () => {
         setError(null);
         setSuccessMessage(null);
 
-        if (!email ) {
-            setError("Please provide both email and phone number.");
-            return;
-        }
 
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:5001/auth/forget-password", {
-                email
-            });
-
+            const response = await forgetPassword({email});
+            console.log(response);
+         
             if (response.data.success) {
                 setSuccessMessage("Check your mail to reset your password.");
                 setEmail("");

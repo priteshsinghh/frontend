@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { loginUser } from "../../APIs/api";
 
 interface FormData {
     identifier: string;
@@ -40,13 +40,15 @@ const Login: React.FC = () => {
                 ? { email: formData.identifier, password: formData.password }
                 : { phoneNumber: formData.identifier, password: formData.password };
 
-            const response = await axios.post("http://localhost:5001/auth/login", payload, {
-                withCredentials: true,
-            });
+
+            const response = await loginUser(payload);
+            console.log(response);
+
 
             if (response.data.status === "ok" && response.data.data) {
                 const { token, userRole } = response.data.data;
 
+                alert("Login Successfull");
                 // Store in localStorage
                 localStorage.setItem("token", token);
                 localStorage.setItem("userRole", userRole);
@@ -113,9 +115,8 @@ const Login: React.FC = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full text-white py-2 rounded-md transition duration-300 ${
-                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg"
-                        }`}
+                        className={`w-full text-white py-2 rounded-md transition duration-300 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg"
+                            }`}
                     >
                         {loading ? "Logging in..." : "Login"}
                     </button>

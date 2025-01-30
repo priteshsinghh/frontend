@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import { verifiedEmail } from "../../APIs/api";
 
 const EmailVerification: React.FC = () => {
   const [verificationStatus, setVerificationStatus] = useState<string>("");
@@ -8,22 +8,19 @@ const EmailVerification: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Extract query parameters from the URL
+    
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get("token");
     const phoneNumber = queryParams.get("phoneNumber");
 
-    // Verify email through the backend API
+    
     const verifyEmail = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5001/auth/mail-verification`,
-          { params: { token, phoneNumber } }
-        );
+        const response = await verifiedEmail({ params: { token, phoneNumber } });
 
         if (response.data.success) {
           setVerificationStatus("User verified successfully! Click to login...");
-        //   setTimeout(() => navigate("/auth/login"), 3000); // Redirect to login after 3 seconds
+        
         } else {
           setVerificationStatus("Verification failed. Invalid token or phone number.");
         }

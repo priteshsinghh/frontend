@@ -1,38 +1,34 @@
-import { useDispatch } from "react-redux";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../../store/authSlice";
-import { useState } from "react";
+import React, { useState } from "react";
+import { registerUser } from "../../APIs/api";
 
-function Register() {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
 
-    const [formData, setFormData] = useState({
+interface FormData {
+    userName: string,
+    email: string,
+    phoneNumber: string,
+    gender: string,
+    userRole: string,
+    password: string,
+    profilePic: any,
+}
+
+const Register: React.FC = () => {
+
+    const [formData, setFormData] = useState<FormData>({
         userName: "",
         email: "",
         phoneNumber: "",
         gender: "",
         userRole: "",
         password: "",
-        profilePic: null,
+        profilePic: "",
     });
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [loading, setLoading] = useState<boolean>(false);
+    const navigate = useNavigate();
 
-    const validateForm = () => {
-        const newErrors: { [key: string]: string } = {};
-        if (!formData.userName) newErrors.userName = "Username is required.";
-        if (!formData.email || !/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = "Valid email is required.";
-        if (!formData.phoneNumber) newErrors.phoneNumber = "Phone number is required.";
-        if (!formData.gender) newErrors.gender = "Gender selection is required.";
-        if (!formData.userRole) newErrors.gender = "role selection is required.";
-        if (!formData.password || formData.password.length < 6)
-            newErrors.password = "Password must be at least 6 characters.";
-        if (formData.profilePic && formData.profilePic.size > 5 * 1024 * 1024)
-            newErrors.profilePic = "Profile picture must be smaller than 5MB.";
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -43,26 +39,33 @@ function Register() {
         if (e.target.files) {
             const file = e.target.files[0];
             if (file.size > 5 * 1024 * 1024) {
-                setErrors((prev) => ({ ...prev, profilePic: "Profile picture must be smaller than 5MB." }));
                 return;
             }
             setFormData({ ...formData, profilePic: file });
-            setErrors((prev) => ({ ...prev, profilePic: "" }));
+
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        setLoading(true);
 
-        const form = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            if (value) form.append(key, value as string | Blob);
-        });
-        dispatch(registerUser(form));
+        try {
+            const response = await registerUser(formData);
+            console.log(response);
 
-        // alert("Registration Successfull");
-        navigate("/auth/login");
+            if (response) {
+                setLoading(false)
+                alert(response.message)
+                navigate("/auth/login");
+            } else {
+                alert(response.message)
+                setLoading(false)
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
     };
 
     console.log("formdata", formData);
@@ -224,9 +227,11 @@ function Register() {
                     {/* Register Button */}
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 hover:shadow-lg transition duration-300"
+                        disabled={loading}
+                        className={`w-full text-white py-2 rounded-md transition duration-300 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg"
+                            }`}
                     >
-                        Register
+                        {loading ? "Register in..." : "Register"}
                     </button>
 
                     <div className="mt-4 text-center">

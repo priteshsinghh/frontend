@@ -1,13 +1,13 @@
 import { AlignJustify, LogOut } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../store/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const AdminHeader: React.FC = ({setOpen}) =>{
 
-    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     function handleLogout(){
-        dispatch(logoutUser());
+        localStorage.clear();
+        navigate("/auth/login")
     }
 
 

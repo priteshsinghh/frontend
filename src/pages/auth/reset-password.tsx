@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { resetPassword } from '../../APIs/api';
 
 const ResetPassword: React.FC = () => {
     const [newPassword, setNewPassword] = useState('');
@@ -32,7 +32,7 @@ const ResetPassword: React.FC = () => {
         };
 
         try {
-            const response = await axios.post('http://localhost:5001/auth/reset-password', resetData);
+            const response = await resetPassword(resetData);
 
             if (response.data.success) {
                 setSuccessMessage(response.data.message);
