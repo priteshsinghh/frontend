@@ -20,10 +20,10 @@ const initialState: UserState = {
     error: null,
 };
 
-interface LoginForm {
-    identifier: string; // email or phone
-    password: string;
-}
+// interface LoginForm {
+//     identifier: string; // email or phone
+//     password: string;
+// }
 
 
 // Register

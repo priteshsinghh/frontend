@@ -1,5 +1,5 @@
-import React from "react";
-import { useRoutes, Navigate } from "react-router-dom";
+
+import { Navigate } from "react-router-dom";
 import AuthLayout from "../components/auth/layout";
 import Login from "../pages/auth/login";
 import Register from "../pages/auth/register";
@@ -11,17 +11,16 @@ import AdminProducts from "../pages/admin/products";
 import AdminOrder from "../pages/admin/orders";
 import Home from "../pages/home/home";
 import NotFound from "../pages/not-found";
-import ShoppingLayout from "../components/home/layout";
 import ProtectedRoute from "../components/common/protectedRoute";
 
-const Router: React.FC = () => {
+
     const isLogin = localStorage.getItem("islogin") === "true";
     const userRole = localStorage.getItem("userRole");
 
-    const routes = useRoutes([
+    const routesConfig = [
         {
             path: "/",
-            element: <ShoppingLayout />,
+            element: <Home />,
             children: [{ path: "home", element: <Home /> }],
         },
         {
@@ -58,9 +57,7 @@ const Router: React.FC = () => {
             path: "*",
             element: <NotFound />,
         },
-    ]);
+    ];
 
-    return routes;
-};
 
-export default Router;
+export default routesConfig;

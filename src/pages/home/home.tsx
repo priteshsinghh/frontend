@@ -5,6 +5,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import Header from "../../components/home/header";
+import Footer from "../../components/home/footer";
 
 
 interface Dish {
@@ -78,6 +80,7 @@ const dishes: Dish[] = [
 const Home: React.FC = () => {
     return (
         <>
+            <Header />
 
             {/* Hero Section */}
             <div
@@ -243,7 +246,7 @@ const Home: React.FC = () => {
             </section>
 
 
-
+            <Footer />
         </>
     );
 };

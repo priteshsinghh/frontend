@@ -1,13 +1,16 @@
+import { useRoutes } from "react-router-dom";
+import routesConfig from "./Routes/router";
 
-import Router from './Routes/router';
+
 
 
 const App: React.FC = () => {
 
-  // const isLogin = localStorage.getItem("islogin");
-  // console.log(isLogin);
 
-  return <Router />;
+  const routes = useRoutes(routesConfig);
+
+
+  return  routes;
 };
 
 export default App;
