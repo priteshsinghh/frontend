@@ -9,7 +9,7 @@ const AuthLayout: React.FC = () => {
                 backgroundImage: "url('/bg.jpg')", // Replace with the correct image path
             }}
         >
-            <div className="bg-black bg-opacity-10 min-h-screen flex items-center justify-center">
+            <div className="bg-black bg-opacity-10 flex items-center justify-center">
                 <div className="text-black max-w-lg">
                     <Outlet />
                 </div>

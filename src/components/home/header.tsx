@@ -10,7 +10,8 @@ const Header: React.FC = () => {
     const dispatch = useDispatch();
 
     function handleLogout(){
-      dispatch(logoutUser());
+      localStorage.clear();
+      navigate("/auth/login")
     }
 
     function handleLogin(){

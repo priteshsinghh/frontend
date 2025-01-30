@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 interface ProtectedRouteProps {
     allowedRoles: string[];  // Accepts an array of allowed roles
+    children : any
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
     const isLogin = localStorage.getItem("islogin");
     const userRole = localStorage.getItem("userRole");
 
@@ -21,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
         );
     }
 
-    return <Outlet />;
+    return children;
 };
 
 export default ProtectedRoute;
