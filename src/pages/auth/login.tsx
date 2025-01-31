@@ -61,7 +61,7 @@ const Login: React.FC = () => {
                     navigate("/shop/home");
                 }
             } else {
-                setError(response.data.error || "Login failed. Please try again.");
+                setError(response.data.error || response.data.message);
             }
         } catch (error: any) {
             console.error("Login error:", error);

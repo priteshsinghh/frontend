@@ -19,13 +19,13 @@ const EmailVerification: React.FC = () => {
         const response = await verifiedEmail({ params: { token, phoneNumber } });
 
         if (response.data.success) {
-          setVerificationStatus("User verified successfully! Click to login...");
+          setVerificationStatus(response.data.message);
         
         } else {
-          setVerificationStatus("Verification failed. Invalid token or phone number.");
+          setVerificationStatus(response.data.message);
         }
       } catch (error) {
-        setVerificationStatus("An error occurred during verification. Please try again.");
+        setVerificationStatus("Token Expired.");
         console.error(error);
       }
     };
