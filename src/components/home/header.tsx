@@ -1,4 +1,6 @@
-// import { User2Icon } from 'lucide-react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { LogOut, User2Icon } from 'lucide-react';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const Header: React.FC = () => {
 
 
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -22,6 +24,7 @@ const Header: React.FC = () => {
 
   function handleNavigate() {
     navigate("/shop/profile")
+    setDropdownOpen(!dropdownOpen)
   }
 
   return (
@@ -91,12 +94,17 @@ const Header: React.FC = () => {
         {dropdownOpen && (
           <div className="absolute mt-16 mr-4 w-50 bg-white rounded-lg shadow-lg py-1">
             <div className='cursor-pointer rounded-lg p-2'>
-              <h1 className='text-2xl  cursor-pointer'>Hello, {user.userName}</h1>
+              <h1 className='text-2xl  cursor-pointer'>Hello, {user.userName.split(" ")[0]}</h1>
               <p className='text-sm '>{user.email}</p>
             </div>
             <h1 className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer" onClick={handleNavigate}>My Account</h1>
-            <h1 className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? 'hidden' : ''}`} onClick={handleLogin}>Login/SignUp</h1>
-            <h1 className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? '' : 'hidden'}`} onClick={handleLogout}>Logout</h1>
+            <h1
+              className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? 'hidden' : ''}`}
+              onClick={handleLogin}
+            >
+              <User2Icon /> Login/SignUp
+            </h1>
+            <h1 className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? '' : 'hidden'}`} onClick={handleLogout}><LogOut /> Logout</h1>
           </div>
         )}
 

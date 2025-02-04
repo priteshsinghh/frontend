@@ -16,6 +16,7 @@ import { Navigate } from "react-router-dom";
 import AdminLayout from "../components/admin/layout";
 import ShoppingLayout from "../components/home/layout";
 import ProfilePage from "../pages/home/profile";
+import EditProfile from "../pages/home/editProfile";
 
 
 const routesConfig = [
@@ -57,6 +58,7 @@ const routesConfig = [
         children: [
             { path: "home", element: <Home /> },
             { path: "profile", element: <ProfilePage /> },
+            { path: "get-profile", element: <EditProfile /> },
         ],
         
     },
