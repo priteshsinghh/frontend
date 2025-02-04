@@ -24,8 +24,6 @@ export const loginUser = async (payload) => {
         {
             withCredentials: true,
         });
-
-    console.log(response);
     return response;
 };
 

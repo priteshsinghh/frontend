@@ -1,25 +1,28 @@
-import { User2Icon } from 'lucide-react';
-import React from 'react';
+// import { User2Icon } from 'lucide-react';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 
 const Header: React.FC = () => {
 
-  const isLogin = localStorage.getItem("islogin")
-  console.log(isLogin);
-  
 
-    const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
-    function handleLogout(){
-      localStorage.clear();
-      navigate("/auth/login")
-    }
+  function handleLogout() {
+    localStorage.clear();
+    navigate("/auth/login")
+  }
 
-    function handleLogin(){
+  function handleLogin() {
+    navigate("/auth/login");
+  }
 
-        navigate("/auth/login");
-    }
+  function handleNavigate() {
+    navigate("/shop/profile")
+  }
 
   return (
     <nav className="flex items-center justify-between px-20 py-4 bg-white border-b">
@@ -74,11 +77,31 @@ const Header: React.FC = () => {
       </ul>
 
       {/* Get Menu Button */}
-      
-      <button className= "flex gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-red-500" onClick={handleLogin} disabled={true}>
-        <User2Icon/> Login/SignUp
-      </button>
-      <button className='flex gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-red-500' onClick={handleLogout}>Logout</button>
+
+      <div className='flex justify-center gap-4 relative'>
+        {/* Profile Picture */}
+        <img
+          src={user?.profilePic}
+          className="object-cover w-[40px] h-[40px] rounded-full cursor-pointer"
+          onClick={() => setDropdownOpen(!dropdownOpen)}  // Toggle dropdown on image click
+          alt="Profile"
+        />
+
+        {/* Dropdown Menu */}
+        {dropdownOpen && (
+          <div className="absolute mt-16 mr-4 w-50 bg-white rounded-lg shadow-lg py-1">
+            <div className='cursor-pointer rounded-lg p-2'>
+              <h1 className='text-2xl  cursor-pointer'>Hello, {user.userName}</h1>
+              <p className='text-sm '>{user.email}</p>
+            </div>
+            <h1 className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer" onClick={handleNavigate}>My Account</h1>
+            <h1 className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? 'hidden' : ''}`} onClick={handleLogin}>Login/SignUp</h1>
+            <h1 className={`block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? '' : 'hidden'}`} onClick={handleLogout}>Logout</h1>
+          </div>
+        )}
+
+      </div>
+
     </nav>
   );
 };

@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { loginUser } from "../../APIs/api";
+import { login } from "../../store/authSlice"; // Adjust path if needed
 
 interface FormData {
     identifier: string;
@@ -10,25 +13,22 @@ interface FormData {
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    // State for form data, errors, and loading
     const [formData, setFormData] = useState<FormData>({ identifier: "", password: "" });
     const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
-    // Handle input changes
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({ ...prevData, [name]: value }));
     };
 
-    // Handle form submission
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError(""); // Clear previous errors
-        setLoading(true); // Set loading state
+        setError("");
+        setLoading(true);
 
-        // Validation
         if (!formData.identifier || !formData.password) {
             setError("Email/Phone and Password are required.");
             setLoading(false);
@@ -40,34 +40,34 @@ const Login: React.FC = () => {
                 ? { email: formData.identifier, password: formData.password }
                 : { phoneNumber: formData.identifier, password: formData.password };
 
-
             const response = await loginUser(payload);
             console.log(response);
 
+            if (response.data.success && response.data) {
+                const { token, user } = response.data;
+                const {userRole} = response.data.user;
 
-            if (response.data.status === "ok" && response.data.data) {
-                const { token, userRole } = response.data.data;
+                console.log(userRole);
 
-                alert("Login Successfull");
-                // Store in localStorage
                 localStorage.setItem("token", token);
                 localStorage.setItem("userRole", userRole);
-                localStorage.setItem("islogin", JSON.stringify(true));
+                
+                
+                dispatch(login({ token, user }));
 
-                // Navigate based on role
-                if (userRole === "seller") {
-                    navigate("/admin/dashboard");
-                } else {
-                    navigate("/shop/home");
-                }
+                navigate(userRole === "seller" ? "/admin/dashboard" : "/shop/home");
             } else {
-                setError(response.data.error || response.data.message);
+                const errorMsg = response.data.error || response.data.message;
+                setError(errorMsg);
+                
             }
         } catch (error: any) {
             console.error("Login error:", error);
-            setError(error.response?.data?.error || "An error occurred. Please try again.");
+            const errorMsg = error.response?.data?.error || "An error occurred. Please try again.";
+            setError(errorMsg);
+            
         } finally {
-            setLoading(false); // Reset loading state
+            setLoading(false);
         }
     };
 
@@ -76,7 +76,6 @@ const Login: React.FC = () => {
             <div className="w-full max-w-md p-8 bg-white bg-opacity-30 backdrop-blur-lg rounded-xl shadow-lg">
                 <h2 className="text-3xl font-bold text-center mb-6 text-black">Login</h2>
                 <form onSubmit={handleSubmit}>
-                    {/* Identifier Input (Email/Phone) */}
                     <div className="mb-4">
                         <label htmlFor="identifier" className="block text-sm font-medium text-black mb-1">
                             Email or Phone Number:
@@ -92,7 +91,6 @@ const Login: React.FC = () => {
                         />
                     </div>
 
-                    {/* Password Input */}
                     <div className="mb-6">
                         <label htmlFor="password" className="block text-sm font-medium text-black mb-1">
                             Password:
@@ -108,10 +106,8 @@ const Login: React.FC = () => {
                         />
                     </div>
 
-                    {/* Error Message */}
                     {error && <p className="mb-4 text-sm text-red-500 text-center">{error}</p>}
 
-                    {/* Login Button */}
                     <button
                         type="submit"
                         disabled={loading}
@@ -121,7 +117,6 @@ const Login: React.FC = () => {
                         {loading ? "Logging in..." : "Login"}
                     </button>
 
-                    {/* Register & Forgot Password Links */}
                     <div className="mt-4 text-center flex flex-col">
                         <p className="text-md text-black">Don’t have an account? </p>
                         <Link to="/auth/register" className="text-blue-700 hover:underline">

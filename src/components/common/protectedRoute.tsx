@@ -1,22 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
+import { useSelector } from "react-redux";
+
 import { Navigate } from "react-router-dom";
+
 
 interface ProtectedRouteProps {
     allowedRoles: string[];  // Accepts an array of allowed roles
     children : any
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children }) => {
-    const isLogin = localStorage.getItem("islogin");
-    const userRole = localStorage.getItem("userRole");
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children, }) => {
+    
 
-    if (!isLogin) {
+    const {user, isAuthenticated} = useSelector((state)=> state.auth)
+
+    
+    if (!isAuthenticated) {
         return <Navigate to="/auth/login" replace />;
     }
 
-    if (!allowedRoles.includes(userRole || "")) {
-        return userRole === "seller" ? (
+    if (!allowedRoles.includes(user?.userRole || "")) {
+        return user?.userRole === "seller" ? (
             <Navigate to="/admin/dashboard" replace />
         ) : (
             <Navigate to="/shop/home" replace />

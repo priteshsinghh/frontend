@@ -15,6 +15,7 @@ import ProtectedRoute from "../components/common/protectedRoute";
 import { Navigate } from "react-router-dom";
 import AdminLayout from "../components/admin/layout";
 import ShoppingLayout from "../components/home/layout";
+import ProfilePage from "../pages/home/profile";
 
 
 const routesConfig = [
@@ -36,7 +37,7 @@ const routesConfig = [
     {
         path: "/admin",
         element: (
-            <ProtectedRoute allowedRoles={["seller"]}>
+            <ProtectedRoute allowedRoles={["seller"] }>
                 <AdminLayout />
             </ProtectedRoute>
         ),
@@ -53,7 +54,11 @@ const routesConfig = [
                 <ShoppingLayout />
             </ProtectedRoute>
         ),
-        children: [{ path: "home", element: <Home /> }],
+        children: [
+            { path: "home", element: <Home /> },
+            { path: "profile", element: <ProfilePage /> },
+        ],
+        
     },
     {
         path: "*",
