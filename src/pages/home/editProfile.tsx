@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { editProfile } from "../../APIs/api";
 import { updateUser } from "../../store/authSlice";
+import { useToast } from "../../hooks/use-toast";
 
 const EditProfile: React.FC = () => {
     const { user } = useSelector((state: any) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const {toast} = useToast();
 
     // State for form inputs
     const [formData, setFormData] = useState({
@@ -19,9 +21,6 @@ const EditProfile: React.FC = () => {
         email: "",
         newPassword: "",
     });
-
-    // State for messages
-    const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
     // Load user data into form
     useEffect(() => {
@@ -53,17 +52,17 @@ const EditProfile: React.FC = () => {
             if (response.data.success) {
 
                 dispatch(updateUser(formData));
-                setMessage({ text: "Profile updated successfully!", type: "success" });
+                toast({ title: "Profile updated successfully!" });
 
 
                 setTimeout(() => navigate("/shop/profile"), 1500); // Redirect to profile after success
 
             } else {
-                setMessage({ text: response.data.message, type: "error" });
+                toast({ title: response.data.message, variant: "destructive" });
             }
         } catch (error) {
             console.error(error);
-            setMessage({ text: "An error occurred while updating your profile.", type: "error" });
+            toast({ title: "An error occurred while updating your profile.", variant: "destructive" });
         }
     };
 
@@ -72,11 +71,11 @@ const EditProfile: React.FC = () => {
             <div className="max-w-lg w-full bg-white p-6 rounded-lg shadow-lg">
                 <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Edit Profile</h2>
 
-                {message && (
+                {/* {message && (
                     <div className={`text-center p-2 rounded-md ${message.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
                         {message.text}
                     </div>
-                )}
+                )} */}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

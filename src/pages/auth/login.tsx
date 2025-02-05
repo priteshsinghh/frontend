@@ -20,7 +20,6 @@ const Login: React.FC = () => {
     
 
     const [formData, setFormData] = useState<FormData>({ identifier: "", password: "" });
-    const [error, setError] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -30,11 +29,14 @@ const Login: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError("");
+
         setLoading(true);
 
         if (!formData.identifier || !formData.password) {
-            setError("Email/Phone and Password are required.");
+            toast({
+                title: "Email/Phone and Password are required.",
+                variant: "destructive"
+            });
             setLoading(false);
             return;
         }
@@ -68,13 +70,19 @@ const Login: React.FC = () => {
                     title: errorMsg,
                     variant: "destructive"
                 })
-                setError(errorMsg);
+                toast({
+                    title: errorMsg,
+                    variant: "destructive"
+                });
                 
             }
         } catch (error: any) {
             console.error("Login error:", error);
             const errorMsg = error.response?.data?.error || "An error occurred. Please try again.";
-            setError(errorMsg);
+            toast({
+                title: errorMsg,
+                variant: "destructive"
+            });
             
         } finally {
             setLoading(false);
@@ -115,8 +123,6 @@ const Login: React.FC = () => {
                             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />
                     </div>
-
-                    {error && <p className="mb-4 text-sm text-red-500 text-center">{error}</p>}
 
                     <button
                         type="submit"

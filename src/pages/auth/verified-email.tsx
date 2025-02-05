@@ -1,11 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { verifiedEmail } from "../../APIs/api";
+import { useToast } from "../../hooks/use-toast";
 
 const EmailVerification: React.FC = () => {
-  const [verificationStatus, setVerificationStatus] = useState<string>("");
+  const [verificationStatus] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation();
+  const {toast} = useToast();
 
   useEffect(() => {
     
@@ -19,13 +22,13 @@ const EmailVerification: React.FC = () => {
         const response = await verifiedEmail({ params: { token, phoneNumber } });
 
         if (response.data.success) {
-          setVerificationStatus(response.data.message);
+          toast({title: response.data.message});
         
         } else {
-          setVerificationStatus(response.data.message);
+          toast({title:response.data.message, variant: "destructive"});
         }
       } catch (error) {
-        setVerificationStatus("Token Expired.");
+        toast({title: "Token Expired.", variant: "destructive"});
         console.error(error);
       }
     };
