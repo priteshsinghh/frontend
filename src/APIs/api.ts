@@ -13,7 +13,6 @@ export const registerUser = async (formData) => {
             },
         });
 
-    console.log(response);
     return response.data;
 };
 
@@ -33,7 +32,6 @@ export const forgetPassword = async (email) => {
         email
     );
 
-    console.log(response);
     return response;
 };
 
@@ -43,7 +41,6 @@ export const resetPassword = async (resetData) => {
         resetData
     );
 
-    console.log(response);
     return response;
 
 };
@@ -54,7 +51,6 @@ export const verifiedEmail = async ({ params: { token, phoneNumber } }) => {
         { params: { token, phoneNumber } }
     );
 
-    console.log(response);
     return response;
 
 };
@@ -63,7 +59,6 @@ export const editProfile = async ({ formData, user }) => {
 
     const response = await axios.put(`http://localhost:5001/shop/edit-profile?email=${user.email}`, formData);
 
-    console.log(response);
     return response;
 
 };
@@ -78,9 +73,16 @@ export const editProfilePic = async (formData) => {
             },
         });
 
-    console.log(response);
     return response;
 
 };
+
+export const changePassword = async ({formData, user}) => {
+    const response = await axios.post(`http://localhost:5001/shop/change-password?email=${user.email}`,
+        formData
+    );
+
+    return response;
+}
 
 

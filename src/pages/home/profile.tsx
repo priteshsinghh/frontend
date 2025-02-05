@@ -14,14 +14,9 @@ const ProfilePage: React.FC = () => {
 
     // Handle Edit Profile Navigation
     function handleEdit() {
-        navigate(`/shop/get-profile?email=${user.email}`);
+        navigate(`/shop/get-profile`);
     }
 
-    // Handle Logout
-    function handleLogout() {
-        localStorage.clear();
-        navigate("/auth/login");
-    }
 
     // Handle Image Upload
     async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
@@ -37,7 +32,7 @@ const ProfilePage: React.FC = () => {
 
                 if (response.data.success) {
                     setImagePreview(response.data.profilePic); // Update preview
-                    alert("Image Changed Succesfully")
+                    alert(response.data.message);
                     dispatch(updateUser({ ...user, profilePic: response.data.profilePic })); // Update Redux
                 }
             } catch (error) {
@@ -50,7 +45,7 @@ const ProfilePage: React.FC = () => {
         <div className="bg-gray-100 min-h-screen py-8 px-4">
             <div className="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-lg">
                 <div className="flex flex-col items-center justify-center mb-6">
-                    <div className="relative w-40 h-40">
+                    <div className="relative w-40 h-40 mb-3">
                         {/* Profile Picture */}
                         <img
                             src={imagePreview}
@@ -86,18 +81,12 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-between items-center mt-6">
+                <div className="flex justify-center items-center mt-6">
                     <button
                         onClick={handleEdit}
                         className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-300"
                     >
                         Edit Profile
-                    </button>
-                    <button
-                        onClick={handleLogout}
-                        className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300"
-                    >
-                        Logout
                     </button>
                 </div>
             </div>

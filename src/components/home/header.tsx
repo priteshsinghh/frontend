@@ -84,11 +84,12 @@ const Header: React.FC = () => {
       <div className='flex justify-center gap-4 relative'>
         {/* Profile Picture */}
         <img
-          src={user?.profilePic}
+          src={user.profilePic}
           className="object-cover w-[40px] h-[40px] rounded-full cursor-pointer"
           onClick={() => setDropdownOpen(!dropdownOpen)}  // Toggle dropdown on image click
           alt="Profile"
         />
+        <h1 className='flex items-center cursor-pointer' onClick={() => setDropdownOpen(!dropdownOpen)}>{user.userName}</h1>
 
         {/* Dropdown Menu */}
         {dropdownOpen && (
@@ -97,12 +98,15 @@ const Header: React.FC = () => {
               <h1 className='text-2xl  cursor-pointer'>Hello, {user.userName.split(" ")[0]}</h1>
               <p className='text-sm '>{user.email}</p>
             </div>
-            <h1 className="block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer" onClick={handleNavigate}>My Account</h1>
+            <hr></hr>
+            <h1 className="flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer" onClick={handleNavigate}>
+              <User2Icon /> My Account
+            </h1>
             <h1
               className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? 'hidden' : ''}`}
               onClick={handleLogin}
             >
-              <User2Icon /> Login/SignUp
+              Login/SignUp
             </h1>
             <h1 className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? '' : 'hidden'}`} onClick={handleLogout}><LogOut /> Logout</h1>
           </div>

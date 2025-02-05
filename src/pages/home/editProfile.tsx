@@ -15,6 +15,9 @@ const EditProfile: React.FC = () => {
         userName: "",
         phoneNumber: "",
         gender: "",
+        oldPassword: "",
+        email: "",
+        newPassword: "",
     });
 
     // State for messages
@@ -27,6 +30,9 @@ const EditProfile: React.FC = () => {
                 userName: user.userName || "",
                 phoneNumber: user.phoneNumber || "",
                 gender: user.gender || "",
+                oldPassword: user.password || "",
+                email: user.email || "",
+                newPassword: "",
             });
         }
     }, [user]);
@@ -41,8 +47,8 @@ const EditProfile: React.FC = () => {
         e.preventDefault();
 
         try {
-            
-            const response = await editProfile({formData, user});
+
+            const response = await editProfile({ formData, user });
 
             if (response.data.success) {
 
@@ -113,10 +119,15 @@ const EditProfile: React.FC = () => {
                         </select>
                     </div>
 
+                    <button type="button" onClick={() => navigate("/shop/change-password")} className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">
+                        Change Password
+                    </button>
+
                     <div className="flex justify-between mt-4">
                         <button type="button" onClick={() => navigate("/shop/profile")} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
                             Cancel
                         </button>
+
                         <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
                             Save Changes
                         </button>
