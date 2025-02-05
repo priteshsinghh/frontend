@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { updateUser } from "../../store/authSlice";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, VerifiedIcon } from "lucide-react";
 import { editProfilePic } from "../../APIs/api";
+import { useToast } from "../../hooks/use-toast";
 
 const ProfilePage: React.FC = () => {
     const { user } = useSelector((state: any) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const {toast} = useToast();
     const [imagePreview, setImagePreview] = useState(user.profilePic);
 
     // Handle Edit Profile Navigation
@@ -32,8 +34,15 @@ const ProfilePage: React.FC = () => {
 
                 if (response.data.success) {
                     setImagePreview(response.data.profilePic); // Update preview
-                    alert(response.data.message);
+                    toast({
+                        title: response.data.message,
+                    });
                     dispatch(updateUser({ ...user, profilePic: response.data.profilePic })); // Update Redux
+                }else{
+                    toast({
+                        title: response.data.message,
+                        variant: "destructive"
+                    });
                 }
             } catch (error) {
                 console.error("Error updating profile picture:", error);
@@ -71,12 +80,15 @@ const ProfilePage: React.FC = () => {
                     {/* User Info */}
                     <div className="flex flex-col">
                         <h1 className="text-3xl font-semibold text-gray-800 mb-2">{user.userName}</h1>
-                        <p className="text-gray-500 text-lg mb-2">Email: {user.email}</p>
+                        <div className="flex justify-between gap-2 items-center mb-2">
+                            <p className="text-gray-500 text-lg">Email: {user.email}</p>
+                            <p className={`text-lg ${user.isVerified === 1 ? "text-green-500" : "text-red-500"}`}>
+                                <VerifiedIcon size={20}/>
+                            </p>
+                        </div>
                         <p className="text-gray-500 text-lg mb-2">Phone No: {user.phoneNumber}</p>
                         <p className="text-gray-500 text-lg mb-4">Gender: {user.gender}</p>
-                        <h1 className={`text-3xl font-semibold ${user.isVerified === 1 ? "text-green-500" : "text-red-500"}`}>
-                            {user.isVerified === 1 ? "Verified" : "Not Verified"}
-                        </h1>
+
                     </div>
                 </div>
 

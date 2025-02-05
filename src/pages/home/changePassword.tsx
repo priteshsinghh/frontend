@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import { changePassword } from "../../APIs/api";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../../hooks/use-toast";
 
 const ChangePassword: React.FC = () => {
 
     const { user } = useSelector((state: any) => state.auth);
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [formData, setFormData] = useState({
         currentPassword: "",
         newPassword: "",
@@ -30,10 +32,15 @@ const ChangePassword: React.FC = () => {
 
 
             if (response.data.success) {
-                alert(response.data.message);
+                toast({
+                    title: response.data.message
+                });
                 setTimeout(() => navigate("/shop/profile"), 1500); // Redirect to profile after success
             } else {
-                alert(response.data.message);
+                toast({
+                    title: response.data.message,
+                    variant: "destructive"
+                });
             }
 
         } catch (error) {

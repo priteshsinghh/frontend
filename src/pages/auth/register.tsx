@@ -3,6 +3,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { registerUser } from "../../APIs/api";
+import { useToast } from "../../hooks/use-toast";
 
 
 interface FormData {
@@ -28,6 +29,7 @@ const Register: React.FC = () => {
     });
     const [loading, setLoading] = useState<boolean>(false);
     const navigate = useNavigate();
+    const {toast} = useToast();
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -56,10 +58,15 @@ const Register: React.FC = () => {
 
             if (response) {
                 setLoading(false)
-                alert(response.message)
+                toast({
+                    title: response.message
+                })
                 navigate("/auth/login");
             } else {
-                alert(response.message)
+                toast({
+                    title: response.message,
+                    variant: "destructive"
+                })
                 setLoading(false)
             }
         } catch (error) {

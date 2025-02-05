@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../APIs/api";
 import { login } from "../../store/authSlice"; // Adjust path if needed
+import { useToast } from "../../hooks/use-toast";
+
 
 interface FormData {
     identifier: string;
@@ -14,6 +16,8 @@ interface FormData {
 const Login: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const {toast} = useToast();
+    
 
     const [formData, setFormData] = useState<FormData>({ identifier: "", password: "" });
     const [error, setError] = useState<string>("");
@@ -52,12 +56,18 @@ const Login: React.FC = () => {
                 localStorage.setItem("token", token);
                 localStorage.setItem("userRole", userRole);
                 
-                
                 dispatch(login({ token, user }));
+                toast({
+                    title: response.data.message
+                })
 
                 navigate(userRole === "seller" ? "/admin/dashboard" : "/shop/home");
             } else {
                 const errorMsg = response.data.error || response.data.message;
+                toast({
+                    title: errorMsg,
+                    variant: "destructive"
+                })
                 setError(errorMsg);
                 
             }
