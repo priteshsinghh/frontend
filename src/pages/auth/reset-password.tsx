@@ -2,32 +2,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../APIs/api';
+import { useToast } from '../../hooks/use-toast';
 
 const ResetPassword: React.FC = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate()
+    const {toast} = useToast();
 
     const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
-            setError('Passwords do not match');
+            toast({title: 'Passwords do not match', variant: "destructive"});
             return;
         }
 
         setLoading(true);
-        setError(null);
+        
 
         const token = new URLSearchParams(window.location.search).get('token');
-        const phoneNumber = new URLSearchParams(window.location.search).get('phoneNumber');
+        
 
         const resetData = {
             token,
-            phoneNumber,
             newPassword,
         };
 
@@ -35,35 +34,30 @@ const ResetPassword: React.FC = () => {
             const response = await resetPassword(resetData);
 
             if (response.data.success) {
-                setSuccessMessage(response.data.message);
+                toast({title: response.data.message});
                 setNewPassword('');
                 setConfirmPassword('');
+                setTimeout(()=> navigate("/auth/login"), 1500);
             } else {
-                setError(response.data.message);
+                toast({title: response.data.message, variant: "destructive"});
             }
         } catch (error: any) {
             console.error('Error resetting password:', error);
-            setError(
-                error.response?.data?.message || 'Failed to reset password. Please try again later.'
+            toast(
+                {title: "invalid token", variant: "destructive"}
             );
         } finally {
             setLoading(false);
         }
     };
 
-    const handleGoToLogin = () => {
-        navigate("/auth/login");
-    };
 
     return (
         <div className="">
             <div className="w-full max-w-md p-8 bg-white bg-opacity-30 backdrop-blur-lg rounded-xl shadow-lg">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Reset Your Password</h2>
-                    {error && <p className="mt-2 text-center bg-white text-sm text-red-600">{error}</p>}
-                    {successMessage && (
-                        <p className="mt-2 text-center bg-white text-sm text-green-600">{successMessage}</p>
-                    )}
+            
                 </div>
                 <form className="mt-8 space-y-6" onSubmit={handleResetPassword}>
                     <div className="rounded-md shadow-sm -space-y-px">
@@ -115,18 +109,6 @@ const ResetPassword: React.FC = () => {
                         </button>
                     </div>
                 </form>
-                {successMessage && (
-                    <div className="mt-4">
-                        <button
-                            onClick={handleGoToLogin}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent text-sm 
-                                font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none 
-                                focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                            Go to Login
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );

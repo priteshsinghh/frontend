@@ -1,35 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { forgetPassword } from "../../APIs/api";
+import { useToast } from "../../hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const ForgetPassword: React.FC = () => {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const { toast } = useToast();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setError(null);
-        setSuccessMessage(null);
-
 
         setLoading(true);
 
         try {
-            const response = await forgetPassword({email});
+            const response = await forgetPassword({ email });
             console.log(response);
-         
+
             if (response.data.success) {
-                setSuccessMessage("Check your mail to reset your password.");
+                toast({ title: "Check your mail to reset your password." });
                 setEmail("");
                 setIsSubmitted(true); // Disable inputs after successful submission
             } else {
-                setError(response.data.message);
+                toast({ title: response.data.message, variant: "destructive" });
             }
         } catch (err: any) {
-            setError(
+            toast(
                 err.response?.data?.message || "An error occurred. Please try again later."
             );
         } finally {
@@ -43,15 +42,6 @@ const ForgetPassword: React.FC = () => {
                 <h2 className="text-2xl font-bold text-center mb-6 text-gray-900">
                     Forget Password
                 </h2>
-
-                {error && (
-                    <p className="mb-4 text-sm bg-white text-red-500 text-center">{error}</p>
-                )}
-                {successMessage && (
-                    <p className="mb-4 text-sm bg-white text-green-800 text-center">
-                        {successMessage}
-                    </p>
-                )}
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
@@ -76,13 +66,22 @@ const ForgetPassword: React.FC = () => {
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200"
-                        disabled={loading || isSubmitted} // Disable button if loading or submitted
-                    >
-                        {loading ? "Sending..." : isSubmitted ? "Submitted" : "Submit"}
-                    </button>
+                    <div className="flex justify-between">
+                        <button
+                            type="submit"
+                            className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200"
+                            disabled={loading || isSubmitted} // Disable button if loading or submitted
+                        >
+                            {loading ? "Sending..." : isSubmitted ? "Submitted" : "Submit"}
+                        </button>
+
+                        <button
+                            className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200"
+                            onClick={()=> navigate("/auth/login")}
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
