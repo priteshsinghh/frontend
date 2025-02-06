@@ -7,8 +7,6 @@ import EmailVerification from "../pages/auth/verified-email";
 import ForgetPassword from "../pages/auth/forget-password";
 import ResetPassword from "../pages/auth/reset-password";
 import AdminDashboard from "../pages/admin/dashboard";
-import AdminProducts from "../pages/admin/products";
-import AdminOrder from "../pages/admin/orders";
 import Home from "../pages/home/home";
 import NotFound from "../pages/not-found";
 import ProtectedRoute from "../components/common/protectedRoute";
@@ -45,8 +43,6 @@ const routesConfig = [
         ),
         children: [
             { path: "dashboard", element: <AdminDashboard /> },
-            { path: "products", element: <AdminProducts /> },
-            { path: "orders", element: <AdminOrder /> },
         ],
     },
     {
