@@ -77,10 +77,26 @@ export const editProfilePic = async (formData) => {
 
 };
 
-export const changePassword = async ({formData, user}) => {
+export const changePassword = async ({ formData, user }) => {
     const response = await axios.post(`http://localhost:5001/shop/change-password?email=${user.email}`,
         formData
     );
+
+    return response;
+}
+
+
+export const addRestaurant = async (formData) => {
+    const response = await axios.post("http://localhost:5001/seller/add-restaurant",
+        formData,
+        {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+    return response;
+}
+export const fetchRestaurant = async () => {
+    const response = await axios.get("http://localhost:5001/seller/get-restaurant");
 
     return response;
 }

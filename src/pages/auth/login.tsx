@@ -63,7 +63,7 @@ const Login: React.FC = () => {
                     title: response.data.message
                 })
 
-                navigate(userRole === "seller" ? "/admin/dashboard" : "/shop/home");
+                navigate(userRole === "seller" ? "/seller/dashboard" : "/shop/home");
             } else {
                 const errorMsg = response.data.error || response.data.message;
                 toast({
