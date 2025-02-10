@@ -8,7 +8,7 @@ const SellerLayout: React.FC = () => {
             <SellerSidebar />
             <div className="flex flex-1 flex-col">
                 <SellerHeader />
-                <div className="">
+                <div className="mx-w-lg">
                     <Outlet />
                 </div>
             </div>

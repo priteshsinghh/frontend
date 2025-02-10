@@ -22,7 +22,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles, children,
 
     if (!allowedRoles.includes(user?.userRole || "")) {
         return user?.userRole === "seller" ? (
-            <Navigate to="/admin/dashboard" replace />
+            <Navigate to="/seller/dashboard" replace />
         ) : (
             <Navigate to="/shop/home" replace />
         );

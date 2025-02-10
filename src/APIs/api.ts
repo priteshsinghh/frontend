@@ -96,9 +96,28 @@ export const addRestaurant = async (formData) => {
     return response;
 }
 export const fetchRestaurant = async () => {
-    const response = await axios.get("http://localhost:5001/seller/get-restaurant");
+    const response = await axios.get("http://localhost:5001/seller/fetch-restaurant");
 
     return response;
 }
+
+export const fetchRestaurantDetails = async (id) => {
+    const response = await axios.get(`http://localhost:5001/seller/get-restaurant?id=${id}`,
+    );
+
+    console.log(response);
+    return response;
+}
+
+export const deleteRestaurant = async (id) => {
+    const response = await axios.delete(`http://localhost:5001/seller/delete-restaurant?id=${id}`,
+    );
+
+    console.log(response);
+    return response;
+}
+
+
+
 
 

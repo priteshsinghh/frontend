@@ -16,6 +16,7 @@ import EditProfile from "../pages/home/editProfile";
 import ChangePassword from "../pages/home/changePassword";
 import SellerLayout from "../components/seller/layout";
 import SellerDashboard from "../pages/seller/dashboard";
+import RestaurantDetails from "../pages/seller/restaurant-details";
 
 
 const routesConfig = [
@@ -43,6 +44,7 @@ const routesConfig = [
         ),
         children: [
             { path: "dashboard", element: <SellerDashboard /> },
+            { path: "restaurant-details", element: <RestaurantDetails /> },
         ],
     },
     {

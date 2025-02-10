@@ -4,7 +4,8 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { useToast } from "../../hooks/use-toast";
 import { Clock, DollarSign, MapPin, Phone, Utensils } from "lucide-react";
-import { addRestaurant, fetchRestaurant } from "../../APIs/api";
+import { addRestaurant, deleteRestaurant, fetchRestaurant } from "../../APIs/api";
+import { useNavigate } from "react-router-dom";
 
 const SellerDashboard: React.FC = () => {
     const [restaurants, setRestaurants] = useState([]);
@@ -21,6 +22,7 @@ const SellerDashboard: React.FC = () => {
         image: null,
     });
     const { toast } = useToast();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchRestaurants();
@@ -72,6 +74,27 @@ const SellerDashboard: React.FC = () => {
         }
     };
 
+    const handelDelete = async (e: { preventDefault: () => void; }) => {
+        e.preventDefault();
+        try {
+
+            const id = restaurants.restaurant_id;
+            console.log(id);
+            
+            const response = await deleteRestaurant(id)
+
+            if (response.data.success) {
+                toast({
+                    title: response.data.message,
+                })
+            }
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
     return (
         <div className="p-6">
             <Dialog open={open} onOpenChange={setOpen}>
@@ -81,7 +104,8 @@ const SellerDashboard: React.FC = () => {
                     </Button>
 
                 </DialogTrigger>
-                <DialogContent className="overflow-auto w-[650px] h-[600px]">
+                <DialogContent className="overflow-auto w-full max-w-[650px] h-auto max-h-[90vh] p-4 sm:p-6 rounded-lg">
+
                     <DialogHeader>
                         <DialogTitle>Add a New Restaurant</DialogTitle>
                     </DialogHeader>
@@ -257,9 +281,18 @@ const SellerDashboard: React.FC = () => {
                                     <p className="text-gray-600 text-sm">{restaurant.description}</p>
                                 </div>
 
-                                <button className="w-full mt-5 bg-indigo-500 text-white py-3 rounded-lg text-base font-semibold hover:bg-indigo-600 transition-all">
-                                    View Details
-                                </button>
+                                <div className="flex justify-between gap-8">
+                                    <button
+                                        onClick={()=> navigate(`/seller/restaurant-details?id=${restaurant.restaurant_id}`)}
+                                        className=" w-full mt-5 bg-indigo-500 text-white py-3 rounded-lg text-base font-semibold hover:bg-indigo-600 transition-all">
+                                        View Details
+                                    </button>
+                                    <button
+                                        onClick={handelDelete}
+                                        className="w-full mt-5 bg-red-500 text-white py-3 rounded-lg text-base font-semibold hover:bg-indigo-600 transition-all">
+                                        Delete
+                                    </button>
+                                </div>
                             </CardContent>
                         </Card>
 
