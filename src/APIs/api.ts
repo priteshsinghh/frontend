@@ -118,6 +118,35 @@ export const deleteRestaurant = async (id) => {
 }
 
 
+export const addCategory = async ({ restaurant_id, name }) => {
+    const response = await axios.post("http://localhost:5001/seller/add-category",
+        { restaurant_id, name }
+    );
+
+    console.log(response);
+    return response;
+}
+export const fetchCategories = async (id) => {
+    const response = await axios.get(`http://localhost:5001/seller/fetch-category?id=${id}`
+    );
+
+    // console.log(response);
+    return response;
+}
+export const addMenuItem = async (payload) => {
+    const response = await axios.post("http://localhost:5001/seller/add-menuItem",
+        payload,
+        {
+            headers: {
+                'Content-Type': 'multipart/form-data', // Ensure the correct content type for FormData
+            },
+        }
+    );
+
+    console.log(response);
+    return response;
+}
+
 
 
 
