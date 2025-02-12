@@ -105,7 +105,6 @@ export const fetchRestaurantDetails = async (id) => {
     const response = await axios.get(`http://localhost:5001/seller/get-restaurant?id=${id}`,
     );
 
-    console.log(response);
     return response;
 }
 
@@ -133,6 +132,8 @@ export const fetchCategories = async (id) => {
     // console.log(response);
     return response;
 }
+
+
 export const addMenuItem = async (payload) => {
     const response = await axios.post("http://localhost:5001/seller/add-menuItem",
         payload,
@@ -144,6 +145,15 @@ export const addMenuItem = async (payload) => {
     );
 
     console.log(response);
+    return response;
+}
+
+
+export const fetchMenu = async(id) => {
+    const response = await axios.get(`http://localhost:5001/seller/fetch-menu?id=${id}`);
+
+    console.log(response);
+    
     return response;
 }
 

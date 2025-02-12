@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails } from "../../APIs/api";
+import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
 import { useToast } from "../../hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
+import { Input } from "../../components/ui/input";
 
 const RestaurantDetails = () => {
     const [categories, setCategories] = useState([]);
@@ -12,6 +14,8 @@ const RestaurantDetails = () => {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [menuItems, setMenuItems] = useState([]);
     const [restaurants, setRestaurants] = useState("");
+    const [menuCategories, setMenuCategories] = useState("");
+    const [open, setOpen] = useState(false);
 
     const location = useLocation();
     const { toast } = useToast();
@@ -21,6 +25,7 @@ const RestaurantDetails = () => {
     useEffect(() => {
         if (id) {
             fetchDetails(id);
+            fetchMenuCategories(id);
         }
         loadCategories();
     }, []);
@@ -37,6 +42,20 @@ const RestaurantDetails = () => {
         }
     };
 
+    const fetchMenuCategories = async (id?: string) => {
+        try {
+
+            const response = await fetchMenu(id);
+
+            if (response.data && response.data.categories) {
+                setMenuCategories(response.data.categories)
+                setOpen(false)
+            }
+
+        } catch (error) {
+            console.error("Error fetching restaurant details:", error);
+        }
+    }
 
     const loadCategories = async () => {
         try {
@@ -78,14 +97,16 @@ const RestaurantDetails = () => {
                     category_id: selectedCategory,
                     ...item
                 }
-                const response =  await addMenuItem(payload);
-                if(response.data.success){
+                const response = await addMenuItem(payload);
+                if (response.data.success) {
                     toast({
                         title: response.data.message
                     })
                 }
 
             }
+            setOpen(false);
+            fetchMenuCategories(id);
             setMenuItems([]);
         } catch (error: any) {
             console.error("Error adding menu item:", error);
@@ -112,54 +133,53 @@ const RestaurantDetails = () => {
         <div className="p-6">
             <div>
                 {restaurants ? (
-                    <div>
+                    <div className="mb-2">
                         <div className="relative w-full h-48">
+                            <h1 className="font-bold font-mono">{restaurants.restaurantName}</h1>
+                            <h1>{restaurants.cuisineType} </h1>
                             <img src={restaurants.image}
                                 alt={restaurants.restaurantName}
                                 className="relative w-full h-full object-cover rounded-lg"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg"></div>
+                            {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg"></div> */}
                             <h1 className="absolute bottom-1 left-4 text-3xl font-bold text-white">{restaurants.restaurantName}</h1>
                         </div>
-                        <p>{restaurants.description}</p>
-                        <h1>{restaurants.address}</h1>
                     </div>
                 ) : (
                     <p>Loading restaurant details...</p>
                 )}
             </div>
 
-            <Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger>
-                    <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 rounded-lg shadow-md py-2 px-4">
+                    <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 rounded-lg shadow-lg py-3 px-6 transform hover:scale-105">
                         Add Menu
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="overflow-auto w-full max-w-[650px] h-auto max-h-[90vh] p-6 rounded-lg shadow-lg bg-white">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-semibold">Add New Menu</DialogTitle>
+                <DialogContent className="overflow-auto w-full max-w-[800px] h-auto max-h-[90vh] p-8 rounded-lg shadow-xl bg-gradient-to-r from-white to-gray-100 transition-all duration-300">
+                    <DialogHeader className="mb-4">
+                        <DialogTitle className="text-2xl font-bold text-center text-purple-800">Add New Menu</DialogTitle>
                     </DialogHeader>
 
-                    <div className="mb-4 flex flex-col gap-2">
-                        <div className="flex gap-4">
-                            <input
+                    <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
+                        <div className="flex flex-1 gap-4">
+                            <Input
                                 type="text"
                                 placeholder="New Category"
                                 value={newCategory}
                                 onChange={(e) => setNewCategory(e.target.value)}
-                                className="border px-2 w-1/2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                required
+                                className=""
                             />
-                            <button
+                            <Button
                                 onClick={handleAddCategory}
-                                className="bg-green-500 text-white px-2 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
+                                className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
                                 Add Category
-                            </button>
+                            </Button>
                         </div>
 
                         <select
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 w-full"
+                            className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black w-full sm:w-1/2"
                         >
                             <option value="">Select Category</option>
                             {categories.map((cat) => (
@@ -170,63 +190,100 @@ const RestaurantDetails = () => {
                         </select>
                     </div>
 
-                    <div className="mt-6">
+                    <Accordion type="multiple" className="mt-6">
                         {menuItems.map((item, index) => (
-                            <div key={index} className="flex flex-col gap-4 mb-4 border p-4 rounded-lg shadow-sm bg-gray-50">
-                                <input
-                                    type="text"
-                                    placeholder="Item Name"
-                                    value={item.name}
-                                    onChange={(e) => handleMenuItemChange(index, "name", e.target.value)}
-                                    className="border p-2 w-1/4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Description"
-                                    value={item.description}
-                                    onChange={(e) => handleMenuItemChange(index, "description", e.target.value)}
-                                    className="border p-2 w-2/4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Price"
-                                    value={item.price}
-                                    onChange={(e) => handleMenuItemChange(index, "price", e.target.value)}
-                                    className="border p-2 w-3/4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Quantity"
-                                    value={item.quantity}
-                                    onChange={(e) => handleMenuItemChange(index, "quantity", e.target.value)}
-                                    className="border p-2 w-4/4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                                <input
-                                    type="file"
-                                    accept=".jpeg,.png,.jpg"
-                                    onChange={(e) => handleMenuItemChange(index, "image", e.target.files[0])}
-                                    className="border p-2 w-full rounded-md shadow-sm focus:outline-none"
-                                />
-                            </div>
+                            <AccordionItem key={index} value={`item-${index}`} className="my-3">
+                                <AccordionTrigger className="text-lg font-semibold bg-purple-200 p-3 rounded-t-lg shadow-sm hover:bg-purple-300 transition-all duration-200">
+                                    Menu Item {index + 1}
+                                </AccordionTrigger>
+                                <AccordionContent className="border p-6 bg-gray-50">
+                                    <Input
+                                        type="text"
+                                        placeholder="Item Name"
+                                        value={item.name}
+                                        onChange={(e) => handleMenuItemChange(index, "name", e.target.value)}
+                                        className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    />
+                                    <Input
+                                        type="text"
+                                        placeholder="Description"
+                                        value={item.description}
+                                        onChange={(e) => handleMenuItemChange(index, "description", e.target.value)}
+                                        className="mt-3"
+                                    />
+                                    <Input
+                                        type="number"
+                                        placeholder="Price"
+                                        value={item.price}
+                                        onChange={(e) => handleMenuItemChange(index, "price", e.target.value)}
+                                        className="mt-3"
+                                    />
+                                    <Input
+                                        type="number"
+                                        placeholder="Quantity"
+                                        value={item.quantity}
+                                        onChange={(e) => handleMenuItemChange(index, "quantity", e.target.value)}
+                                        className="mt-3"
+                                    />
+                                    <Input
+                                        type="file"
+                                        accept=".jpeg,.png,.jpg"
+                                        onChange={(e) => handleMenuItemChange(index, "image", e.target.files[0])}
+                                        className="mt-3"
+                                    />
+                                </AccordionContent>
+                            </AccordionItem>
                         ))}
-                    </div>
+                    </Accordion>
 
-                    <div className="mt-6 flex gap-4 justify-start">
+                    <div className="mt-8 flex gap-4 justify-between sm:justify-start">
                         <Button
                             onClick={addMenuItemField}
-                            className="bg-blue-500 text-white shadow-sm hover:bg-blue-600 transition-colors duration-300"
-                        >
+                            className="bg-blue-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-600 transition-all duration-300 transform hover:scale-105">
                             + Add Item
                         </Button>
                         <Button
                             onClick={handleAddMenuItem}
-                            className="bg-indigo-500 text-white shadow-sm hover:bg-indigo-600 transition-colors duration-300"
-                        >
+                            className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
                             Submit Menu
                         </Button>
                     </div>
                 </DialogContent>
             </Dialog>
+
+
+
+            <div className="mt-6 gap-6 p-2 flex flex-wrap">
+                {menuCategories.length === 0 ? (
+                    <p className="text-gray-500">No Menu Available click <strong>Add Menu</strong> to add</p>
+                ) : (
+                    menuCategories.map((category) => (
+                        <div key={category.category_id} className="border p-4 rounded-lg shadow-md bg-[#FAF1E6] w-[383px] ">
+                            <div className="inline-block bg-[#C49A6C] text-white font-bold px-4 py-1 rounded-t-md shadow-md uppercase tracking-wide">
+                                {category.name}
+                            </div>
+                            <ul className="mt-3 divide-y divide-gray-300">
+                                {
+                                    category.menu_items.length === 0 ? (
+                                        <li className="p-4 text-gray-500">No items available</li>
+                                    ) : (
+                                        category.menu_items.map((item) => (
+                                            <li key={item.menuItem_id} className="flex justify-between gap-24 items-start py-3">
+                                                <div className="mb-2">
+                                                    <h2 className="text-md font-semibold font-mono italic uppercase">{item.name}</h2>
+                                                    <p className="text-xs italic text-gray-600">( {item.description} )</p>
+                                                </div>
+                                                <span className="text-md font-bold text-gray-700">₹{item.price}</span>
+                                            </li>
+                                        ))
+                                    )
+                                }
+                            </ul>
+                        </div>
+                    ))
+                )
+                }
+            </div>
 
 
         </div>
