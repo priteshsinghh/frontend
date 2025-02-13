@@ -96,7 +96,7 @@ const SellerDashboard: React.FC = () => {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-6 lg:px-24">
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                     <Button className="mb-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-purple-600 hover:to-indigo-700 transition-all duration-300">
@@ -104,7 +104,7 @@ const SellerDashboard: React.FC = () => {
                     </Button>
 
                 </DialogTrigger>
-                <DialogContent className="overflow-auto w-full max-w-[650px] h-auto max-h-[90vh] p-4 sm:p-6 rounded-lg">
+                <DialogContent className="overflow-auto scroll-smooth w-full max-w-[650px] h-auto max-h-[90vh] p-4 sm:p-6 rounded-lg">
 
                     <DialogHeader>
                         <DialogTitle>Add a New Restaurant</DialogTitle>
@@ -229,7 +229,7 @@ const SellerDashboard: React.FC = () => {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
                     {restaurants.map((restaurant, index) => (
                         <Card key={index} className="rounded-2xl overflow-hidden shadow-lg transition-transform transform hover:scale-[1.03] hover:shadow-2xl bg-white">
                             {/* Image Section with Overlay */}

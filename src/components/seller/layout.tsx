@@ -1,18 +1,17 @@
 import { Outlet } from "react-router-dom";
 import SellerHeader from "./header";
-import SellerSidebar from "./sidebar";
+// import SellerSidebar from "./sidebar";
 
 const SellerLayout: React.FC = () => {
     return (
-        <div className="flex min-h-screen w-full">
-            <SellerSidebar />
-            <div className="flex flex-1 flex-col">
-                <SellerHeader />
-                <div className="mx-w-lg">
-                    <Outlet />
-                </div>
+
+        <div className="flex flex-1 flex-col">
+            <SellerHeader />
+            <div className="flex flex-col w-full ">
+                <Outlet />
             </div>
         </div>
+
     );
 };
 
