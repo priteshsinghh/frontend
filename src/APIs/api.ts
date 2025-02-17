@@ -158,9 +158,9 @@ export const fetchMenu = async (id) => {
 }
 
 
-export const editMenu = async ({id, formData}) => {
+export const editMenu = async (id, menuItems1) => {
     const response = await axios.put(`http://localhost:5001/seller/edit-menu?id=${id}`,
-        formData
+        menuItems1
     );
     return response;
 }

@@ -18,14 +18,11 @@ const RestaurantDetails = () => {
     const [restaurants, setRestaurants] = useState("");
     const [menuCategories, setMenuCategories] = useState("");
     const [open, setOpen] = useState(false);
-    const [onOPen, setOnOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        name: "test",
-        description: "dummy description",
-        price: 54,
-        quantity: "23",
-        image: null
-    })
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedCategory1, setSelectedCategory1] = useState(null);
+    const [menuItems1, setMenuItems1] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     const location = useLocation();
     const { toast } = useToast();
@@ -119,7 +116,7 @@ const RestaurantDetails = () => {
             }
             loadCategories();
             fetchMenuCategories(id);
-            setOnOpen(false);
+            setDialogOpen(false);
             setMenuItems([]);
         } catch (error: any) {
             console.error("Error adding menu item:", error);
@@ -140,27 +137,54 @@ const RestaurantDetails = () => {
         setMenuItems([...menuItems, { name: "", description: "", price: "", quantity: "", image: null }]);
     };
 
-    const handleEditMenuItem = async () => {
-        try {
+    const handleEditMenuItems = (categoryId) => {
+        // Find the category by categoryId
+        const category = menuCategories.find((cat) => cat.category_id === categoryId);
 
-            const response = await editMenu({ id, formData });
-            console.log(response);
+        // Set the category and its items to state
+        setSelectedCategory1(category);
+        setMenuItems1(category.menu_items);
+
+        // Open the modal
+        setIsModalOpen(true);
+    };
+
+    const handleEditMenuItemChange = (index, field, value) => {
+        const updatedItems = [...menuItems1];
+        updatedItems[index] = { ...updatedItems[index], [field]: value };
+        setMenuItems1(updatedItems);
+    };
+
+
+    const handleSaveChanges = async () => {
+        try {
+            const id = selectedCategory1.category_id;
+            console.log(id);
+
+            console.log(menuItems1);
+
+            const response = await editMenu(id, menuItems1);  // API call to save changes
 
             if (response.data.success) {
                 toast({
                     title: response.data.message
-                })
+                });
+                setIsModalOpen(false);
+                // Reload categories and menu items if necessary
+                loadCategories();
+                fetchMenuCategories(selectedCategory1.restaurant_id);
             }
 
         } catch (error) {
-            console.log(error);
+            console.error("Error saving changes:", error);
             toast({
-                title: error.response.data.message,
-                variant: "destructive"
-            })
-
+                title: error.response?.data?.message || 'Error saving menu items',
+                variant: 'destructive'
+            });
         }
-    }
+    };
+
+
 
     return (
 
@@ -236,7 +260,7 @@ const RestaurantDetails = () => {
                 </Dialog>
 
                 {/* Modal for menu items */}
-                <Dialog open={onOPen} onOpenChange={setOnOpen}>
+                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger>
                         <Button className="bg-gradient-to-l from-indigo-500 to-indigo-950">
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
@@ -319,6 +343,72 @@ const RestaurantDetails = () => {
                     </DialogContent>
 
                 </Dialog>
+
+
+                {/* modal for edit items */}
+                <Dialog open={isModalOpen} onOpenChange={() => setIsModalOpen(false)}>
+                    <DialogContent className="overflow-y-auto max-h-96">
+                        <DialogTitle>Edit Menu Items</DialogTitle>
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold">{selectedCategory1?.name}</h3>
+
+                            <Accordion type="multiple" className="mt-6">
+                                {menuItems1.map((menu, index) => (
+                                    <AccordionItem key={menu.menuItem_id} value={`item-${index}`} className="my-3">
+                                        <AccordionTrigger className="text-lg font-semibold bg-indigo-200 p-3 rounded-t-lg shadow-sm hover:bg-indigo-300 transition-all duration-200">
+                                            Item {index + 1}
+                                        </AccordionTrigger>
+                                        <AccordionContent className="border p-6 bg-gray-50">
+                                            <Input
+                                                type="text"
+                                                placeholder="Item Name"
+                                                value={menu.name}
+                                                onChange={(e) => handleEditMenuItemChange(index, "name", e.target.value)}
+                                                className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            />
+                                            <Input
+                                                type="text"
+                                                placeholder="Description"
+                                                value={menu.description}
+                                                onChange={(e) => handleEditMenuItemChange(index, "description", e.target.value)}
+                                                className="mt-3"
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Price"
+                                                value={menu.price}
+                                                onChange={(e) => handleEditMenuItemChange(index, "price", e.target.value)}
+                                                className="mt-3"
+                                            />
+                                            <Input
+                                                type="text"
+                                                placeholder="Quantity"
+                                                value={menu.quantity}
+                                                onChange={(e) => handleEditMenuItemChange(index, "quantity", e.target.value)}
+                                                className="mt-3"
+                                            />
+                                            <Input
+                                                type="file"
+                                                accept=".jpeg,.png,.jpg"
+                                                onChange={(e) => handleEditMenuItemChange(index, "image", e.target.files[0])}
+                                                className="mt-3"
+                                            />
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
+
+                            <div className="mt-8 flex gap-4 justify-between sm:justify-start">
+                                <Button
+                                    onClick={handleSaveChanges}  // Handle save changes function
+                                    className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
             </div>
 
 
@@ -330,7 +420,9 @@ const RestaurantDetails = () => {
                                 <div key={category.category_id} className="bg-white rounded-lg shadow-md overflow-hidden">
                                     <div className="flex items-center justify-between bg-indigo-500 text-white px-4 py-2 uppercase font-serif italic">
                                         {category.name}
-                                        <h1 className="p-2 bg-gray-200 rounded-full cursor-pointer" onClick={handleEditMenuItem}><Pen size={15} className="text-black" /></h1>
+                                        <button onClick={() => handleEditMenuItems(category.category_id)}>
+                                            <Pen size={15} className="text-black cursor-pointer" />
+                                        </button>
                                     </div>
                                     <ul className="divide-y divide-gray-200">
                                         {category.menu_items.length === 0 ? (
@@ -356,6 +448,8 @@ const RestaurantDetails = () => {
                     }
                 </div>
             </div>
+
+
 
 
 
