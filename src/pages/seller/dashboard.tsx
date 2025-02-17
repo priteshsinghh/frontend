@@ -281,17 +281,17 @@ const SellerDashboard: React.FC = () => {
                                     <p className="text-gray-600 text-sm">{restaurant.description}</p>
                                 </div>
 
-                                <div className="flex justify-between gap-8">
-                                    <button
+                                <div className="flex justify-between gap-8 pt-2">
+                                    <Button
                                         onClick={()=> navigate(`/seller/restaurant-details?id=${restaurant.restaurant_id}`)}
-                                        className=" w-full mt-5 bg-indigo-500 text-white py-3 rounded-lg text-base font-semibold hover:bg-indigo-600 transition-all">
+                                        className=" bg-indigo-500 text-white  text-base font-semibold hover:bg-indigo-600 transition-all">
                                         View Details
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         onClick={handelDelete}
-                                        className="w-full mt-5 bg-red-500 text-white py-3 rounded-lg text-base font-semibold hover:bg-indigo-600 transition-all">
+                                        className="  bg-red-500 text-white  text-base font-semibold hover:bg-indigo-600 transition-all">
                                         Delete
-                                    </button>
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>

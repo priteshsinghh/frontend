@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu } from "../../APIs/api";
+import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
 import { useToast } from "../../hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
 import { Input } from "../../components/ui/input";
-import { MapPin, PhoneCall } from "lucide-react";
+import { MapPin, Pen, PhoneCall } from "lucide-react";
+
 
 const RestaurantDetails = () => {
     const [categories, setCategories] = useState([]);
@@ -17,6 +18,14 @@ const RestaurantDetails = () => {
     const [restaurants, setRestaurants] = useState("");
     const [menuCategories, setMenuCategories] = useState("");
     const [open, setOpen] = useState(false);
+    const [onOPen, setOnOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        name: "test",
+        description: "dummy description",
+        price: 54,
+        quantity: "23",
+        image: null
+    })
 
     const location = useLocation();
     const { toast } = useToast();
@@ -76,8 +85,10 @@ const RestaurantDetails = () => {
                 toast({
                     title: response.data.message
                 })
-                setNewCategory("");
                 loadCategories();
+                fetchMenuCategories(id);
+                setOpen(false)
+                setNewCategory("");
             }
 
         } catch (error: any) {
@@ -108,7 +119,7 @@ const RestaurantDetails = () => {
             }
             loadCategories();
             fetchMenuCategories(id);
-            setOpen(false);
+            setOnOpen(false);
             setMenuItems([]);
         } catch (error: any) {
             console.error("Error adding menu item:", error);
@@ -128,6 +139,28 @@ const RestaurantDetails = () => {
     const addMenuItemField = () => {
         setMenuItems([...menuItems, { name: "", description: "", price: "", quantity: "", image: null }]);
     };
+
+    const handleEditMenuItem = async () => {
+        try {
+
+            const response = await editMenu({ id, formData });
+            console.log(response);
+
+            if (response.data.success) {
+                toast({
+                    title: response.data.message
+                })
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast({
+                title: error.response.data.message,
+                variant: "destructive"
+            })
+
+        }
+    }
 
     return (
 
@@ -158,7 +191,7 @@ const RestaurantDetails = () => {
                             <h1 className="font-bold flex gap-1 items-center text-gray-700"> <MapPin className="w-5 h-5" /> {restaurants.address}</h1>
                             <div className="flex gap-2">
                                 <h2 className="pr-2 text-gray-600 border-r border-r-black">Closing at {restaurants.closingHour}</h2>
-                                <h2 className="text-gray-600 border-r border-r-black pr-2"> Starting delivery from ₹{restaurants.deliveryFee} </h2>  
+                                <h2 className="text-gray-600 border-r border-r-black pr-2"> Starting delivery from ₹{restaurants.deliveryFee} </h2>
                                 <h2 className="flex gap-1 text-gray-600 items-center"> <PhoneCall className="h-5 w-5" /> {restaurants.contactDetails} </h2>
                             </div>
                         </div>
@@ -169,139 +202,158 @@ const RestaurantDetails = () => {
                 )}
             </div>
 
-
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger>
-                    <div className="flex justify-start lg:px-24 px-6">
-                        <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 shadow-lg transform hover:scale-105">
-                            Add Menu
+            <div className="flex px-6 lg:px-24 gap-4">
+                {/* Modal for menu category */}
+                <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger>
+                        <Button className="bg-gradient-to-r from-indigo-500 to-indigo-950 hover:bg-slate-400 transition-colors duration-300">
+                            {menuCategories.length === 0 ? "Add Menu Category" : "Add More Category"}
                         </Button>
-                    </div>
-                </DialogTrigger>
-                <DialogContent className="overflow-auto w-full max-w-[800px] h-auto max-h-[90vh] p-8 rounded-lg shadow-xl bg-gradient-to-r from-white to-gray-100 transition-all duration-300">
-                    <DialogHeader className="mb-4">
-                        <DialogTitle className="text-2xl font-bold text-center text-purple-800">Add New Menu</DialogTitle>
-                    </DialogHeader>
+                    </DialogTrigger>
+                    <DialogContent className="overflow-auto p-8 rounded-lg shadow-xl bg-gradient-to-r from-white to-gray-100 transition-all duration-300">
+                        <DialogHeader className="mb-4">
+                            <DialogTitle className="text-2xl font-bold text-center text-purple-800">Add New Menu</DialogTitle>
+                        </DialogHeader>
 
-                    <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
-                        <div className="flex flex-1 gap-4">
-                            <Input
-                                type="text"
-                                placeholder="New Category"
-                                value={newCategory}
-                                onChange={(e) => setNewCategory(e.target.value)}
-                                className=""
-                            />
-                            <Button
-                                onClick={handleAddCategory}
-                                className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
-                                Add Category
-                            </Button>
+                        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
+                            <div className="flex flex-1 gap-4">
+                                <Input
+                                    type="text"
+                                    placeholder="New Category"
+                                    value={newCategory}
+                                    onChange={(e) => setNewCategory(e.target.value)}
+                                    className=""
+                                />
+                                <Button
+                                    onClick={handleAddCategory}
+                                    className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
+                                    Add Category
+                                </Button>
+                            </div>
+
                         </div>
+                    </DialogContent>
+                </Dialog>
 
+                {/* Modal for menu items */}
+                <Dialog open={onOPen} onOpenChange={setOnOpen}>
+                    <DialogTrigger>
+                        <Button className="bg-gradient-to-l from-indigo-500 to-indigo-950">
+                            {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="overflow-y-auto max-h-96">
+                        <DialogHeader>
+                            <DialogTitle>Add Menu Item</DialogTitle>
+                        </DialogHeader>
                         <select
                             onChange={(e) => setSelectedCategory(e.target.value)}
                             className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black w-full sm:w-1/2"
                         >
                             <option value="">Select Category</option>
-                            {categories.map((cat) => (
+                            {categories.length === 0 ? "not category available" : categories.map((cat) => (
                                 <option key={cat.category_id} value={cat.category_id}>
                                     {cat.name}
                                 </option>
                             ))}
                         </select>
-                    </div>
 
-                    <Accordion type="multiple" className="mt-6">
-                        {menuItems.map((item, index) => (
-                            <AccordionItem key={index} value={`item-${index}`} className="my-3">
-                                <AccordionTrigger className="text-lg font-semibold bg-purple-200 p-3 rounded-t-lg shadow-sm hover:bg-purple-300 transition-all duration-200">
-                                    Menu Item {index + 1}
-                                </AccordionTrigger>
-                                <AccordionContent className="border p-6 bg-gray-50">
-                                    <Input
-                                        type="text"
-                                        placeholder="Item Name"
-                                        value={item.name}
-                                        onChange={(e) => handleMenuItemChange(index, "name", e.target.value)}
-                                        className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                    />
-                                    <Input
-                                        type="text"
-                                        placeholder="Description"
-                                        value={item.description}
-                                        onChange={(e) => handleMenuItemChange(index, "description", e.target.value)}
-                                        className="mt-3"
-                                    />
-                                    <Input
-                                        type="number"
-                                        placeholder="Price"
-                                        value={item.price}
-                                        onChange={(e) => handleMenuItemChange(index, "price", e.target.value)}
-                                        className="mt-3"
-                                    />
-                                    <Input
-                                        type="number"
-                                        placeholder="Quantity"
-                                        value={item.quantity}
-                                        onChange={(e) => handleMenuItemChange(index, "quantity", e.target.value)}
-                                        className="mt-3"
-                                    />
-                                    <Input
-                                        type="file"
-                                        accept=".jpeg,.png,.jpg"
-                                        onChange={(e) => handleMenuItemChange(index, "image", e.target.files[0])}
-                                        className="mt-3"
-                                    />
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
+                        <Accordion type="multiple" className="mt-6">
+                            {menuItems.map((item, index) => (
+                                <AccordionItem key={index} value={`item-${index}`} className="my-3">
+                                    <AccordionTrigger className="text-lg font-semibold bg-purple-200 p-3 rounded-t-lg shadow-sm hover:bg-purple-300 transition-all duration-200">
+                                        Menu Item {index + 1}
+                                    </AccordionTrigger>
+                                    <AccordionContent className="border p-6 bg-gray-50">
+                                        <Input
+                                            type="text"
+                                            placeholder="Item Name"
+                                            value={item.name}
+                                            onChange={(e) => handleMenuItemChange(index, "name", e.target.value)}
+                                            className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                        />
+                                        <Input
+                                            type="text"
+                                            placeholder="Description"
+                                            value={item.description}
+                                            onChange={(e) => handleMenuItemChange(index, "description", e.target.value)}
+                                            className="mt-3"
+                                        />
+                                        <Input
+                                            type="number"
+                                            placeholder="Price"
+                                            value={item.price}
+                                            onChange={(e) => handleMenuItemChange(index, "price", e.target.value)}
+                                            className="mt-3"
+                                        />
+                                        <Input
+                                            type="text"
+                                            placeholder="Quantity"
+                                            value={item.quantity}
+                                            onChange={(e) => handleMenuItemChange(index, "quantity", e.target.value)}
+                                            className="mt-3"
+                                        />
+                                        <Input
+                                            type="file"
+                                            accept=".jpeg,.png,.jpg"
+                                            onChange={(e) => handleMenuItemChange(index, "image", e.target.files[0])}
+                                            className="mt-3"
+                                        />
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
 
-                    <div className="mt-8 flex gap-4 justify-between sm:justify-start">
-                        <Button
-                            onClick={addMenuItemField}
-                            className="bg-blue-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-600 transition-all duration-300 transform hover:scale-105">
-                            + Add Item
-                        </Button>
-                        <Button
-                            onClick={handleAddMenuItem}
-                            className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
-                            Submit Menu
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
+                        <div className="mt-8 flex gap-4 justify-between sm:justify-start">
+                            <Button
+                                onClick={addMenuItemField}
+                                className="bg-blue-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-600 transition-all duration-300 transform hover:scale-105">
+                                + Add Item
+                            </Button>
+                            <Button
+                                onClick={handleAddMenuItem}
+                                className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
+                                Submit Menu
+                            </Button>
+                        </div>
+                    </DialogContent>
+
+                </Dialog>
+            </div>
 
 
             <div className="container p-6 lg:px-24">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {menuCategories.length === 0 ? (
-                        <p className="text-gray-500">No Menu Available. Click <strong>Add Menu</strong> to add.</p>
-                    ) : (
-                        menuCategories.map((category) => (
-                            <div key={category.category_id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div className="bg-indigo-500 text-white px-4 py-2 uppercase font-serif italic">
-                                    {category.name}
+                    {menuCategories.length > 0 ?
+                        (
+                            menuCategories.map((category) => (
+                                <div key={category.category_id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                                    <div className="flex items-center justify-between bg-indigo-500 text-white px-4 py-2 uppercase font-serif italic">
+                                        {category.name}
+                                        <h1 className="p-2 bg-gray-200 rounded-full cursor-pointer" onClick={handleEditMenuItem}><Pen size={15} className="text-black" /></h1>
+                                    </div>
+                                    <ul className="divide-y divide-gray-200">
+                                        {category.menu_items.length === 0 ? (
+                                            <li className="p-4 text-gray-500">No items available</li>
+                                        ) : (
+                                            category.menu_items.map((item) => (
+                                                <li key={item.menuItem_id} className="p-4 flex justify-between items-start">
+                                                    <div>
+                                                        <h2 className="text-md font-semibold uppercase font-mono text-gray-800 italic">{item.name}</h2>
+                                                        <p className="text-xs text-gray-600">( {item.description} )</p>
+                                                    </div>
+                                                    <span className="text-md font-semibold text-gray-800 font-mono">₹{item.price}</span>
+                                                </li>
+                                            ))
+                                        )}
+                                    </ul>
                                 </div>
-                                <ul className="divide-y divide-gray-200">
-                                    {category.menu_items.length === 0 ? (
-                                        <li className="p-4 text-gray-500">No items available</li>
-                                    ) : (
-                                        category.menu_items.map((item) => (
-                                            <li key={item.menuItem_id} className="p-4 flex justify-between items-start">
-                                                <div>
-                                                    <h2 className="text-md font-semibold uppercase font-mono text-gray-800 italic">{item.name}</h2>
-                                                    <p className="text-xs text-gray-600">( {item.description} )</p>
-                                                </div>
-                                                <span className="text-md font-semibold text-gray-800 font-mono">₹{item.price}</span>
-                                            </li>
-                                        ))
-                                    )}
-                                </ul>
-                            </div>
-                        ))
-                    )}
+                            ))
+                        )
+                        : (
+                            <p className="text-gray-500">No Menu Available. Click <strong>Add Menu</strong> to add.</p>
+                        )
+                    }
                 </div>
             </div>
 

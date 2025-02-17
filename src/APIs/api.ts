@@ -58,7 +58,6 @@ export const verifiedEmail = async ({ params: { token, phoneNumber } }) => {
 export const editProfile = async ({ formData, user }) => {
 
     const response = await axios.put(`http://localhost:5001/shop/edit-profile?email=${user.email}`, formData);
-
     return response;
 
 };
@@ -95,6 +94,8 @@ export const addRestaurant = async (formData) => {
 
     return response;
 }
+
+
 export const fetchRestaurant = async () => {
     const response = await axios.get("http://localhost:5001/seller/fetch-restaurant");
 
@@ -125,6 +126,8 @@ export const addCategory = async ({ restaurant_id, name }) => {
     console.log(response);
     return response;
 }
+
+
 export const fetchCategories = async (id) => {
     const response = await axios.get(`http://localhost:5001/seller/fetch-category?id=${id}`
     );
@@ -149,11 +152,16 @@ export const addMenuItem = async (payload) => {
 }
 
 
-export const fetchMenu = async(id) => {
+export const fetchMenu = async (id) => {
     const response = await axios.get(`http://localhost:5001/seller/fetch-menu?id=${id}`);
+    return response;
+}
 
-    console.log(response);
-    
+
+export const editMenu = async ({id, formData}) => {
+    const response = await axios.put(`http://localhost:5001/seller/edit-menu?id=${id}`,
+        formData
+    );
     return response;
 }
 
