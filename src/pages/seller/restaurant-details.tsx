@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu, deleteCategory, deleteMenuItem } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
 import { useToast } from "../../hooks/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
 import { Input } from "../../components/ui/input";
-import { MapPin, Pen, PhoneCall, Trash2 } from "lucide-react";
+import { MapPin, Pen, PhoneCall, Trash2, X } from "lucide-react";
 import { Label } from "../../components/ui/label";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
+import { Separator } from "../../components/ui/separator";
 
 
 const RestaurantDetails = () => {
@@ -53,8 +54,6 @@ const RestaurantDetails = () => {
 
     const fetchMenuCategories = async (id?: string) => {
         try {
-            console.log(id);
-
             const response = await fetchMenu(id);
 
             if (response.data && response.data.categories) {
@@ -304,18 +303,21 @@ const RestaurantDetails = () => {
 
                         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
                             <div className="flex flex-1 gap-4">
-                                <Input
-                                    type="text"
-                                    placeholder="New Category"
-                                    value={newCategory}
-                                    onChange={(e) => setNewCategory(e.target.value)}
-                                    className=""
-                                />
-                                <Button
-                                    onClick={handleAddCategory}
-                                    className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
-                                    Add Category
-                                </Button>
+                                <form action="" className="flex gap-5">
+                                    <Input
+                                        type="text"
+                                        placeholder="New Category"
+                                        value={newCategory}
+                                        onChange={(e) => setNewCategory(e.target.value)}
+                                        className=""
+                                        required
+                                    />
+                                    <Button
+                                        onClick={handleAddCategory}
+                                        className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
+                                        Add Category
+                                    </Button>
+                                </form>
                             </div>
 
                         </div>
@@ -329,83 +331,108 @@ const RestaurantDetails = () => {
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="overflow-y-auto max-h-96 lg:max-h-[650px]">
-                        <DialogHeader>
-                            <DialogTitle>Add Menu Item</DialogTitle>
+                    <DialogContent className="lg:max-h-[550px] max-h-96 flex flex-col p-0">
+                        <DialogHeader className="sticky pt-4">
+                            <DialogTitle className="flex justify-center">Add Menu Item</DialogTitle>
+                            <div className="flex justify-center">
+                                <select
+                                    required
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black w-full sm:w-1/2"
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.length === 0
+                                        ? "not category available"
+                                        : categories.map((cat) => (
+                                            <option key={cat.category_id} value={cat.category_id}>
+                                                {cat.name}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
                         </DialogHeader>
-                        <select
-                            onChange={(e) => setSelectedCategory(e.target.value)}
-                            className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black w-full sm:w-1/2"
-                        >
-                            <option value="">Select Category</option>
-                            {categories.length === 0 ? "not category available" : categories.map((cat) => (
-                                <option key={cat.category_id} value={cat.category_id}>
-                                    {cat.name}
-                                </option>
-                            ))}
-                        </select>
 
-                        <Accordion type="multiple" className="mt-6">
-                            {menuItems.map((item, index) => (
-                                <AccordionItem key={index} value={`item-${index}`} className="my-3">
-                                    <AccordionTrigger className="text-lg font-semibold bg-purple-200 p-3 rounded-t-lg shadow-sm hover:bg-purple-300 transition-all duration-200">
-                                        Menu Item {index + 1}
-                                    </AccordionTrigger>
-                                    <AccordionContent className="border p-6 bg-gray-50">
-                                        <Input
-                                            type="text"
-                                            placeholder="Item Name"
-                                            value={item.name}
-                                            onChange={(e) => handleMenuItemChange(index, "name", e.target.value)}
-                                            className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                        />
-                                        <Input
-                                            type="text"
-                                            placeholder="Description"
-                                            value={item.description}
-                                            onChange={(e) => handleMenuItemChange(index, "description", e.target.value)}
-                                            className="mt-3"
-                                        />
-                                        <Input
-                                            type="number"
-                                            placeholder="Price"
-                                            value={item.price}
-                                            onChange={(e) => handleMenuItemChange(index, "price", e.target.value)}
-                                            className="mt-3"
-                                        />
-                                        <Input
-                                            type="text"
-                                            placeholder="Quantity"
-                                            value={item.quantity}
-                                            onChange={(e) => handleMenuItemChange(index, "quantity", e.target.value)}
-                                            className="mt-3"
-                                        />
-                                        <Input
-                                            type="file"
-                                            accept=".jpeg,.png,.jpg"
-                                            onChange={(e) => handleMenuItemChange(index, "image", e.target.files[0])}
-                                            className="mt-3"
-                                        />
-                                    </AccordionContent>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
+                        <Separator />
 
-                        <div className="mt-8 flex gap-4 justify-between sm:justify-start">
-                            <Button
-                                onClick={addMenuItemField}
-                                className="bg-blue-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-600 transition-all duration-300 transform hover:scale-105">
-                                + Add Item
-                            </Button>
-                            <Button
-                                onClick={handleAddMenuItem}
-                                className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                Submit Menu
-                            </Button>
+                        <div className="overflow-y-auto no-scrollbar flex-1 lg:max-h-[650px] px-4">
+                            <Accordion type="multiple" className="">
+                                {menuItems.map((item, index) => (
+                                    <AccordionItem key={index} value={`item-${index}`} className="mt-3">
+                                        <div className="flex items-center justify-between">
+                                            <AccordionTrigger className="text-lg font-semibold bg-purple-200 p-3 rounded-t-lg shadow-sm hover:no-underline hover:bg-purple-300 transition-all duration-200">
+                                                Menu Item {index + 1}
+                                            </AccordionTrigger>
+                                            <button
+                                                onClick={() => handleClose(index)}
+                                                className="text-red-500 hover:text-red-700 transition-all duration-200"
+                                                aria-label="Close"
+                                            >
+                                                <X size={20}/>
+                                            </button>
+                                        </div>
+
+                                        <AccordionContent className="border p-6 bg-gray-50">
+                                            <Input
+                                                type="text"
+                                                placeholder="Item Name"
+                                                value={item.name}
+                                                onChange={(e) => handleMenuItemChange(index, "name", e.target.value)}
+                                                className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                            />
+                                            <Input
+                                                type="text"
+                                                placeholder="Description"
+                                                value={item.description}
+                                                onChange={(e) => handleMenuItemChange(index, "description", e.target.value)}
+                                                className="mt-3"
+                                            />
+                                            <Input
+                                                type="number"
+                                                placeholder="Price"
+                                                value={item.price}
+                                                onChange={(e) => handleMenuItemChange(index, "price", e.target.value)}
+                                                className="mt-3"
+                                            />
+                                            <Input
+                                                type="text"
+                                                placeholder="Quantity"
+                                                value={item.quantity}
+                                                onChange={(e) => handleMenuItemChange(index, "quantity", e.target.value)}
+                                                className="mt-3"
+                                            />
+                                            <Input
+                                                type="file"
+                                                accept=".jpeg,.png,.jpg"
+                                                onChange={(e) => handleMenuItemChange(index, "image", e.target.files[0])}
+                                                className="mt-3"
+                                            />
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
                         </div>
-                    </DialogContent>
 
+                        <Separator />
+
+                        <DialogFooter className="sticky px-4 pb-4">
+                            <div className="flex gap-4 justify-between sm:justify-start">
+                                <Button
+                                    onClick={addMenuItemField}
+                                    className="bg-blue-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
+                                >
+                                    + Add Item
+                                </Button>
+                                <Button
+                                    onClick={handleAddMenuItem}
+                                    className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105"
+                                >
+                                    Submit Menu
+                                </Button>
+                            </div>
+                        </DialogFooter>
+                    </DialogContent>
                 </Dialog>
+
 
 
                 {/* modal for edit items */}
@@ -418,7 +445,7 @@ const RestaurantDetails = () => {
                             <Accordion type="multiple" className="mt-6">
                                 {menuItems1.map((menu, index) => (
                                     <AccordionItem key={menu.menuItem_id} value={`item-${index}`} className="my-3">
-                                        <AccordionTrigger className="text-lg font-semibold bg-indigo-200 p-3 rounded-t-lg shadow-sm hover:bg-indigo-300 transition-all duration-200">
+                                        <AccordionTrigger className="text-lg font-semibold bg-indigo-200 p-3 rounded-t-lg hover:no-underline shadow-sm hover:bg-indigo-300 transition-all duration-200">
                                             {menu.name}
                                         </AccordionTrigger>
                                         <AccordionContent className="border p-6 bg-gray-50">
@@ -506,11 +533,11 @@ const RestaurantDetails = () => {
                                         {category.name}
                                         <div className="flex gap-4">
                                             <button onClick={() => handleEditMenuItems(category.category_id)} className="border p-1 rounded-full bg-gray-200 hover:bg-gray-500">
-                                                <Pen size={15} className="text-black cursor-pointer" />
+                                                <Pen size={15} className="text-black cursor-pointer hover:text-white" />
                                             </button>
 
                                             <button onClick={() => handleDeleteCategory(category.category_id, category.restaurant_id)} className="border p-1 rounded-full bg-gray-200 hover:bg-red-500">
-                                                <Trash2 size={15} className="text-black cursor-pointer" />
+                                                <Trash2 size={15} className="text-black cursor-pointer hover:text-white" />
                                             </button>
                                         </div>
                                     </div>
@@ -527,7 +554,7 @@ const RestaurantDetails = () => {
                                                     <div className="flex gap-4">
                                                         <span className="text-md font-semibold text-gray-800 font-mono">₹{item.price}</span>
                                                         <button onClick={() => handleDeleteMenuItem(item.menuItem_id, item.restaurant_id)}>
-                                                            <Trash2 size={20} className="text-black cursor-pointer hover:text-red-500 hover:scale-110" />
+                                                            <Trash2 size={20} className="text-black cursor-pointer hover:text-red-500 transition-all duration-300 transform hover:scale-110" />
                                                         </button>
                                                     </div>
                                                 </li>

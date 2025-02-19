@@ -8,8 +8,6 @@ const App: React.FC = () => {
 
 
   const routes = useRoutes(routesConfig);
-
-
   return  routes;
 };
 
