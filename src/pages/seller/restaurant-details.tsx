@@ -1,13 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu } from "../../APIs/api";
+import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu, deleteCategory, deleteMenuItem } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
 import { useToast } from "../../hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../../components/ui/accordion";
 import { Input } from "../../components/ui/input";
-import { MapPin, Pen, PhoneCall } from "lucide-react";
+import { MapPin, Pen, PhoneCall, Trash2 } from "lucide-react";
+import { Label } from "../../components/ui/label";
 
 
 const RestaurantDetails = () => {
@@ -51,12 +53,12 @@ const RestaurantDetails = () => {
 
     const fetchMenuCategories = async (id?: string) => {
         try {
+            console.log(id);
 
             const response = await fetchMenu(id);
 
             if (response.data && response.data.categories) {
                 setMenuCategories(response.data.categories)
-                setOpen(false)
             }
 
         } catch (error) {
@@ -158,19 +160,29 @@ const RestaurantDetails = () => {
 
     const handleSaveChanges = async () => {
         try {
-            const id = selectedCategory1.category_id;
-            console.log(id);
+            const formData = new FormData();
+            formData.append("id", selectedCategory1.category_id);
 
-            console.log(menuItems1);
+            menuItems1.forEach((item, index) => {
+                formData.append(`menuItems[${index}][restaurant_id]`, item.restaurant_id);
+                formData.append(`menuItems[${index}][category_id]`, item.category_id);
+                formData.append(`menuItems[${index}][menuItem_id]`, item.menuItem_id);
+                formData.append(`menuItems[${index}][name]`, item.name);
+                formData.append(`menuItems[${index}][description]`, item.description);
+                formData.append(`menuItems[${index}][price]`, item.price);
+                formData.append(`menuItems[${index}][quantity]`, item.quantity);
 
-            const response = await editMenu(id, menuItems1);  // API call to save changes
+                if (item.image instanceof File) {
+                    formData.append("image", item.image); // Use same field name for images
+                }
+            });
+            const response = await editMenu(formData); // API call to save changes
 
             if (response.data.success) {
                 toast({
                     title: response.data.message
                 });
                 setIsModalOpen(false);
-                // Reload categories and menu items if necessary
                 loadCategories();
                 fetchMenuCategories(selectedCategory1.restaurant_id);
             }
@@ -184,6 +196,56 @@ const RestaurantDetails = () => {
         }
     };
 
+
+    const handleDeleteCategory = async (catId, restId) => {
+        try {
+
+            console.log(id);
+
+            const response = await deleteCategory(catId);
+
+            if (response.data.success) {
+                toast({
+                    title: response.data.message
+                })
+            }
+            console.log(restId);
+
+            loadCategories();
+            fetchMenuCategories(restId);
+
+
+        } catch (error) {
+            console.log(error);
+            toast({
+                title: error.response.data.message,
+                variant: "destructive"
+            })
+        }
+    }
+
+    const handleDeleteMenuItem = async (itemId, restId) => {
+        try {
+
+            const response = await deleteMenuItem(itemId);
+
+            if (response.data.success) {
+                toast({
+                    title: response.data.message
+                })
+            }
+
+            loadCategories();
+            fetchMenuCategories(restId);
+
+        } catch (error) {
+            console.log(error);
+            toast({
+                title: error.response.data.message,
+                variant: "destructive"
+            })
+        }
+    }
 
 
     return (
@@ -227,6 +289,7 @@ const RestaurantDetails = () => {
             </div>
 
             <div className="flex px-6 lg:px-24 gap-4">
+
                 {/* Modal for menu category */}
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger>
@@ -266,7 +329,7 @@ const RestaurantDetails = () => {
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="overflow-y-auto max-h-96">
+                    <DialogContent className="overflow-y-auto max-h-96 lg:max-h-[650px]">
                         <DialogHeader>
                             <DialogTitle>Add Menu Item</DialogTitle>
                         </DialogHeader>
@@ -347,7 +410,7 @@ const RestaurantDetails = () => {
 
                 {/* modal for edit items */}
                 <Dialog open={isModalOpen} onOpenChange={() => setIsModalOpen(false)}>
-                    <DialogContent className="overflow-y-auto max-h-96">
+                    <DialogContent className="overflow-y-auto max-h-96 lg:max-h-[650px]">
                         <DialogTitle>Edit Menu Items</DialogTitle>
                         <div className="space-y-4">
                             <h3 className="text-lg font-semibold">{selectedCategory1?.name}</h3>
@@ -356,43 +419,64 @@ const RestaurantDetails = () => {
                                 {menuItems1.map((menu, index) => (
                                     <AccordionItem key={menu.menuItem_id} value={`item-${index}`} className="my-3">
                                         <AccordionTrigger className="text-lg font-semibold bg-indigo-200 p-3 rounded-t-lg shadow-sm hover:bg-indigo-300 transition-all duration-200">
-                                            Item {index + 1}
+                                            {menu.name}
                                         </AccordionTrigger>
                                         <AccordionContent className="border p-6 bg-gray-50">
-                                            <Input
-                                                type="text"
-                                                placeholder="Item Name"
-                                                value={menu.name}
-                                                onChange={(e) => handleEditMenuItemChange(index, "name", e.target.value)}
-                                                className="border p-4 w-full rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                            />
-                                            <Input
-                                                type="text"
-                                                placeholder="Description"
-                                                value={menu.description}
-                                                onChange={(e) => handleEditMenuItemChange(index, "description", e.target.value)}
-                                                className="mt-3"
-                                            />
-                                            <Input
-                                                type="number"
-                                                placeholder="Price"
-                                                value={menu.price}
-                                                onChange={(e) => handleEditMenuItemChange(index, "price", e.target.value)}
-                                                className="mt-3"
-                                            />
-                                            <Input
-                                                type="text"
-                                                placeholder="Quantity"
-                                                value={menu.quantity}
-                                                onChange={(e) => handleEditMenuItemChange(index, "quantity", e.target.value)}
-                                                className="mt-3"
-                                            />
-                                            <Input
-                                                type="file"
-                                                accept=".jpeg,.png,.jpg"
-                                                onChange={(e) => handleEditMenuItemChange(index, "image", e.target.files[0])}
-                                                className="mt-3"
-                                            />
+                                            <div className="flex flex-col gap-3">
+                                                <div>
+                                                    <Label>Name: </Label>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Item Name"
+                                                        value={menu.name}
+                                                        onChange={(e) => handleEditMenuItemChange(index, "name", e.target.value)}
+                                                        className=""
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <Label>Description: </Label>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Description"
+                                                        value={menu.description}
+                                                        onChange={(e) => handleEditMenuItemChange(index, "description", e.target.value)}
+                                                        className=""
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <Label>Price: </Label>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Price"
+                                                        value={menu.price}
+                                                        onChange={(e) => handleEditMenuItemChange(index, "price", e.target.value)}
+                                                        className=""
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <Label>Quantity: </Label>
+                                                    <Input
+                                                        type="text"
+                                                        placeholder="Quantity"
+                                                        value={menu.quantity}
+                                                        onChange={(e) => handleEditMenuItemChange(index, "quantity", e.target.value)}
+                                                        className=""
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <Label>Add Image: </Label>
+                                                    <Input
+                                                        type="file"
+                                                        accept=".jpeg,.png,.jpg"
+                                                        onChange={(e) => handleEditMenuItemChange(index, "image", e.target.files[0])}
+                                                        className=""
+                                                    />
+                                                </div>
+                                            </div>
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
@@ -413,16 +497,22 @@ const RestaurantDetails = () => {
 
 
             <div className="container p-6 lg:px-24">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {menuCategories.length > 0 ?
                         (
                             menuCategories.map((category) => (
                                 <div key={category.category_id} className="bg-white rounded-lg shadow-md overflow-hidden">
                                     <div className="flex items-center justify-between bg-indigo-500 text-white px-4 py-2 uppercase font-serif italic">
                                         {category.name}
-                                        <button onClick={() => handleEditMenuItems(category.category_id)}>
-                                            <Pen size={15} className="text-black cursor-pointer" />
-                                        </button>
+                                        <div className="flex gap-4">
+                                            <button onClick={() => handleEditMenuItems(category.category_id)} className="border p-1 rounded-full bg-gray-200 hover:bg-gray-500">
+                                                <Pen size={15} className="text-black cursor-pointer" />
+                                            </button>
+
+                                            <button onClick={() => handleDeleteCategory(category.category_id, category.restaurant_id)} className="border p-1 rounded-full bg-gray-200 hover:bg-red-500">
+                                                <Trash2 size={15} className="text-black cursor-pointer" />
+                                            </button>
+                                        </div>
                                     </div>
                                     <ul className="divide-y divide-gray-200">
                                         {category.menu_items.length === 0 ? (
@@ -434,7 +524,12 @@ const RestaurantDetails = () => {
                                                         <h2 className="text-md font-semibold uppercase font-mono text-gray-800 italic">{item.name}</h2>
                                                         <p className="text-xs text-gray-600">( {item.description} )</p>
                                                     </div>
-                                                    <span className="text-md font-semibold text-gray-800 font-mono">₹{item.price}</span>
+                                                    <div className="flex gap-4">
+                                                        <span className="text-md font-semibold text-gray-800 font-mono">₹{item.price}</span>
+                                                        <button onClick={() => handleDeleteMenuItem(item.menuItem_id, item.restaurant_id)}>
+                                                            <Trash2 size={20} className="text-black cursor-pointer hover:text-red-500 hover:scale-110" />
+                                                        </button>
+                                                    </div>
                                                 </li>
                                             ))
                                         )}
@@ -443,16 +538,11 @@ const RestaurantDetails = () => {
                             ))
                         )
                         : (
-                            <p className="text-gray-500">No Menu Available. Click <strong>Add Menu</strong> to add.</p>
+                            <p className="text-gray-500">No Menu Available. Click <strong>Add Menu Category</strong> to add.</p>
                         )
                     }
                 </div>
             </div>
-
-
-
-
-
         </div>
     );
 };

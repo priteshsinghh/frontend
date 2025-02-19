@@ -158,13 +158,31 @@ export const fetchMenu = async (id) => {
 }
 
 
-export const editMenu = async (id, menuItems1) => {
-    const response = await axios.put(`http://localhost:5001/seller/edit-menu?id=${id}`,
-        menuItems1
+export const editMenu = async (formData) => {
+    const response = await axios.put(`http://localhost:5001/seller/edit-menu`,
+        formData,
+        {
+            headers: {
+                'Content-Type': "multipart/form-data",
+            },
+        }
     );
+    console.log(response);
+
     return response;
 }
 
+
+export const deleteCategory = async (id) => {
+    const response = await axios.delete(`http://localhost:5001/seller/delete-category?id=${id}`);
+
+    return response;
+}
+export const deleteMenuItem = async (id) => {
+    const response = await axios.delete(`http://localhost:5001/seller/delete-menu?id=${id}`);
+
+    return response;
+}
 
 
 

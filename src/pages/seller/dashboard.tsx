@@ -220,11 +220,11 @@ const SellerDashboard: React.FC = () => {
 
             {restaurants.length === 0 ? (
                 <div
-                    className="w-full h-96 flex flex-col  text-center bg-cover bg-center text-white "
+                    className="w-full h-96 flex flex-col text-start bg-cover bg-center text-white "
                     style={{ backgroundImage: `url('/restaurant.png')` }}
                 >
                     <div className="mt-3">
-                        <h2 className="text-2xl font-bold text-orange-500">No Restaurants Available</h2>
+                        <h2 className="text-2xl font-bold text-black">No Restaurants Available</h2>
                         <p className="mt-2 text-lg text-gray-700">Click "Add Restaurant" to get started!</p>
                     </div>
                 </div>

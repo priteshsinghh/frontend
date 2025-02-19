@@ -56,7 +56,7 @@ const SellerHeader: React.FC = () => {
 
                         <div className="flex flex-col gap-6">
                             <div className="py-4">
-                                <Link to="/seller/dashboard" className="flex items-center gap-2">
+                                <Link to="/seller/dashboard" className="flex items-center gap-2" onClick={()=> setOpen(false)}>
                                     <House className="h-7 w-7 font-bold" />
                                     <span className="font-bold text-2xl" >Seller Panel</span>
                                 </Link>
