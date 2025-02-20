@@ -16,6 +16,7 @@ import { Separator } from "../../components/ui/separator";
 const RestaurantDetails = () => {
     const [categories, setCategories] = useState([]);
     const [newCategory, setNewCategory] = useState("");
+    const [newEditCategory, setNewEditCategory] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
     const [menuItems, setMenuItems] = useState([]);
     const [restaurants, setRestaurants] = useState("");
@@ -53,6 +54,7 @@ const RestaurantDetails = () => {
     };
 
     const fetchMenuCategories = async (id?: string) => {
+
         try {
             const response = await fetchMenu(id);
 
@@ -75,7 +77,6 @@ const RestaurantDetails = () => {
     };
 
     const handleAddCategory = async () => {
-        if (!newCategory) return;
         try {
             const response = await addCategory({ restaurant_id: id, name: newCategory });
 
@@ -246,6 +247,12 @@ const RestaurantDetails = () => {
         }
     }
 
+    const handleCloseAccordion = (index) => {
+        const updatedItems = menuItems.filter((_, i) => i !== index);
+        setMenuItems(updatedItems);
+    }
+
+    
 
     return (
 
@@ -303,21 +310,21 @@ const RestaurantDetails = () => {
 
                         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
                             <div className="flex flex-1 gap-4">
-                                <form action="" className="flex gap-5">
-                                    <Input
-                                        type="text"
-                                        placeholder="New Category"
-                                        value={newCategory}
-                                        onChange={(e) => setNewCategory(e.target.value)}
-                                        className=""
-                                        required
-                                    />
-                                    <Button
-                                        onClick={handleAddCategory}
-                                        className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
-                                        Add Category
-                                    </Button>
-                                </form>
+
+                                <Input
+                                    type="text"
+                                    placeholder="New Category"
+                                    value={newCategory}
+                                    onChange={(e) => setNewCategory(e.target.value)}
+                                    className=""
+                                    required
+                                />
+                                <Button
+                                    onClick={handleAddCategory}
+                                    className="bg-green-500 text-white px-4 py-2 rounded-md shadow-sm hover:bg-green-600 transition-colors duration-300">
+                                    Add Category
+                                </Button>
+
                             </div>
 
                         </div>
@@ -331,12 +338,11 @@ const RestaurantDetails = () => {
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="lg:max-h-[550px] max-h-96 flex flex-col p-0">
+                    <DialogContent className="lg:max-h-[650px] max-h-96 flex flex-col p-0">
                         <DialogHeader className="sticky pt-4">
                             <DialogTitle className="flex justify-center">Add Menu Item</DialogTitle>
                             <div className="flex justify-center">
                                 <select
-                                    required
                                     onChange={(e) => setSelectedCategory(e.target.value)}
                                     className="border p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black w-full sm:w-1/2"
                                 >
@@ -358,17 +364,17 @@ const RestaurantDetails = () => {
                             <Accordion type="multiple" className="">
                                 {menuItems.map((item, index) => (
                                     <AccordionItem key={index} value={`item-${index}`} className="mt-3">
-                                        <div className="flex items-center justify-between">
-                                            <AccordionTrigger className="text-lg font-semibold bg-purple-200 p-3 rounded-t-lg shadow-sm hover:no-underline hover:bg-purple-300 transition-all duration-200">
+                                        <div className="flex items-center">
+                                            <AccordionTrigger className="text-lg lg:min-w-[478px] w-full font-semibold p-3 rounded-t-lg shadow-sm hover:no-underline bg-purple-200 hover:bg-purple-300 transition-all duration-200">
                                                 Menu Item {index + 1}
+                                                <button
+                                                    onClick={() => handleCloseAccordion(index)}
+                                                    className="relative left-36  text-red-500 hover:text-red-700 transition-all duration-200"
+                                                    aria-label="Close"
+                                                >
+                                                    <X size={20} />
+                                                </button>
                                             </AccordionTrigger>
-                                            <button
-                                                onClick={() => handleClose(index)}
-                                                className="text-red-500 hover:text-red-700 transition-all duration-200"
-                                                aria-label="Close"
-                                            >
-                                                <X size={20}/>
-                                            </button>
                                         </div>
 
                                         <AccordionContent className="border p-6 bg-gray-50">
@@ -437,11 +443,23 @@ const RestaurantDetails = () => {
 
                 {/* modal for edit items */}
                 <Dialog open={isModalOpen} onOpenChange={() => setIsModalOpen(false)}>
-                    <DialogContent className="overflow-y-auto max-h-96 lg:max-h-[650px]">
-                        <DialogTitle>Edit Menu Items</DialogTitle>
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-semibold">{selectedCategory1?.name}</h3>
+                    <DialogContent className="lg:max-h-[650px] max-h-96 flex flex-col p-0">
+                        <DialogHeader className="pt-3">
+                            <div className="flex justify-center flex-col items-center gap-5">
+                                <DialogTitle>Edit Menu Items</DialogTitle>
+                                {/* <h3 className="text-lg font-semibold">{selectedCategory1?.name}</h3> */}
+                                <Input
+                                    type="text"
+                                    value={selectedCategory1?.name}
+                                    className="w-2/4"
+                                />
+                                <Button>Change</Button>
+                            </div>
+                        </DialogHeader>
 
+                        <Separator />
+
+                        <div className="overflow-y-auto no-scrollbar flex-1 lg:max-h-[650px] px-4">
                             <Accordion type="multiple" className="mt-6">
                                 {menuItems1.map((menu, index) => (
                                     <AccordionItem key={menu.menuItem_id} value={`item-${index}`} className="my-3">
@@ -496,6 +514,20 @@ const RestaurantDetails = () => {
 
                                                 <div>
                                                     <Label>Add Image: </Label>
+
+                                                    {/* Display current image if it exists */}
+                                                    {menu.image && (
+                                                        <div>
+                                                            <img
+                                                                src={menu.image}
+                                                                alt="Current Uploaded"
+                                                                style={{ maxWidth: '100px', maxHeight: '100px' }}
+                                                                className="rounded-lg p-2 object-contain"
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    {/* File input to select a new image */}
                                                     <Input
                                                         type="file"
                                                         accept=".jpeg,.png,.jpg"
@@ -508,15 +540,19 @@ const RestaurantDetails = () => {
                                     </AccordionItem>
                                 ))}
                             </Accordion>
+                        </div>
 
-                            <div className="mt-8 flex gap-4 justify-between sm:justify-start">
+                        <Separator />
+
+                        <DialogFooter className="stickey px-4 pb-4">
+                            <div className="flex gap-4 justify-between sm:justify-start">
                                 <Button
                                     onClick={handleSaveChanges}  // Handle save changes function
                                     className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
                                     Save Changes
                                 </Button>
                             </div>
-                        </div>
+                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
 
@@ -532,7 +568,7 @@ const RestaurantDetails = () => {
                                     <div className="flex items-center justify-between bg-indigo-500 text-white px-4 py-2 uppercase font-serif italic">
                                         {category.name}
                                         <div className="flex gap-4">
-                                            <button onClick={() => handleEditMenuItems(category.category_id)} className="border p-1 rounded-full bg-gray-200 hover:bg-gray-500">
+                                            <button onClick={() => handleEditMenuItems(category.category_id)} className={`border p-1 rounded-full bg-gray-200 hover:bg-gray-500 ${category.menu_items.length > 0 ? "" : "hidden"}`}>
                                                 <Pen size={15} className="text-black cursor-pointer hover:text-white" />
                                             </button>
 
