@@ -127,6 +127,17 @@ export const addCategory = async ({ restaurant_id, name }) => {
     return response;
 }
 
+export const editCategory = async({id, name}) => {
+
+    console.log(id);
+    
+    const response = await axios.put("http://localhost:5001/seller/edit-category",
+        {id, name}
+    )
+
+    return response;
+}
+
 
 export const fetchCategories = async (id) => {
     const response = await axios.get(`http://localhost:5001/seller/fetch-category?id=${id}`

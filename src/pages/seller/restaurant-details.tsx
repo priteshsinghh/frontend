@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu, deleteCategory, deleteMenuItem } from "../../APIs/api";
+import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu, deleteCategory, deleteMenuItem, editCategory } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
 import { useToast } from "../../hooks/use-toast";
 import { Button } from "../../components/ui/button";
@@ -38,8 +38,9 @@ const RestaurantDetails = () => {
             fetchDetails(id);
             fetchMenuCategories(id);
         }
+        setNewEditCategory(selectedCategory1?.name || "");
         loadCategories();
-    }, []);
+    }, [selectedCategory1]);
 
     const fetchDetails = async (id?: string) => {
         try {
@@ -99,6 +100,7 @@ const RestaurantDetails = () => {
         }
     };
 
+  
     const handleAddMenuItem = async () => {
         try {
             for (const item of menuItems) {
@@ -158,7 +160,7 @@ const RestaurantDetails = () => {
     };
 
 
-    const handleSaveChanges = async () => {
+    const handleSaveChanges = async (categoryId) => {
         try {
             const formData = new FormData();
             formData.append("id", selectedCategory1.category_id);
@@ -177,14 +179,17 @@ const RestaurantDetails = () => {
                 }
             });
             const response = await editMenu(formData); // API call to save changes
+            const response2 = await editCategory({ id: categoryId, name: newEditCategory })
 
-            if (response.data.success) {
+            if (response.data.success && response2.data.success) {
                 toast({
                     title: response.data.message
                 });
                 setIsModalOpen(false);
                 loadCategories();
                 fetchMenuCategories(selectedCategory1.restaurant_id);
+                setOpen(false)
+                setNewEditCategory(setNewEditCategory.name);
             }
 
         } catch (error) {
@@ -252,7 +257,10 @@ const RestaurantDetails = () => {
         setMenuItems(updatedItems);
     }
 
-    
+    function resetMenuForm() {
+        setSelectedCategory("");
+        setMenuItems([]);
+    }
 
     return (
 
@@ -332,7 +340,7 @@ const RestaurantDetails = () => {
                 </Dialog>
 
                 {/* Modal for menu items */}
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <Dialog open={dialogOpen} onOpenChange={(isOpen => {setDialogOpen(isOpen); if(!isOpen){resetMenuForm()}})}>
                     <DialogTrigger>
                         <Button className="bg-gradient-to-l from-indigo-500 to-indigo-950">
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
@@ -450,11 +458,12 @@ const RestaurantDetails = () => {
                                 {/* <h3 className="text-lg font-semibold">{selectedCategory1?.name}</h3> */}
                                 <Input
                                     type="text"
-                                    value={selectedCategory1?.name}
+                                    value={newEditCategory}
+                                    onChange={(e) => setNewEditCategory(e.target.value)}
                                     className="w-2/4"
                                 />
-                                <Button>Change</Button>
                             </div>
+
                         </DialogHeader>
 
                         <Separator />
@@ -467,8 +476,8 @@ const RestaurantDetails = () => {
                                             {menu.name}
                                         </AccordionTrigger>
                                         <AccordionContent className="border p-6 bg-gray-50">
-                                            <div className="flex flex-col gap-3">
-                                                <div>
+                                            <div className="flex flex-col gap-4">
+                                                <div className="flex flex-col gap-2">
                                                     <Label>Name: </Label>
                                                     <Input
                                                         type="text"
@@ -479,7 +488,7 @@ const RestaurantDetails = () => {
                                                     />
                                                 </div>
 
-                                                <div>
+                                                <div className="flex flex-col gap-2">
                                                     <Label>Description: </Label>
                                                     <Input
                                                         type="text"
@@ -490,7 +499,7 @@ const RestaurantDetails = () => {
                                                     />
                                                 </div>
 
-                                                <div>
+                                                <div className="flex flex-col gap-2">
                                                     <Label>Price: </Label>
                                                     <Input
                                                         type="number"
@@ -501,7 +510,7 @@ const RestaurantDetails = () => {
                                                     />
                                                 </div>
 
-                                                <div>
+                                                <div className="flex flex-col gap-2"> 
                                                     <Label>Quantity: </Label>
                                                     <Input
                                                         type="text"
@@ -512,7 +521,7 @@ const RestaurantDetails = () => {
                                                     />
                                                 </div>
 
-                                                <div>
+                                                <div className="flex flex-col gap-2">
                                                     <Label>Add Image: </Label>
 
                                                     {/* Display current image if it exists */}
@@ -547,7 +556,7 @@ const RestaurantDetails = () => {
                         <DialogFooter className="stickey px-4 pb-4">
                             <div className="flex gap-4 justify-between sm:justify-start">
                                 <Button
-                                    onClick={handleSaveChanges}  // Handle save changes function
+                                    onClick={() => handleSaveChanges(selectedCategory1?.category_id)}  // Handle save changes function
                                     className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
                                     Save Changes
                                 </Button>
@@ -585,7 +594,7 @@ const RestaurantDetails = () => {
                                                 <li key={item.menuItem_id} className="p-4 flex justify-between items-start">
                                                     <div>
                                                         <h2 className="text-md font-semibold uppercase font-mono text-gray-800 italic">{item.name}</h2>
-                                                        <p className="text-xs text-gray-600">( {item.description} )</p>
+                                                        <p className="text-xs text-gray-600">{item.description}</p>
                                                     </div>
                                                     <div className="flex gap-4">
                                                         <span className="text-md font-semibold text-gray-800 font-mono">₹{item.price}</span>
