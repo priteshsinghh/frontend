@@ -313,7 +313,7 @@ const RestaurantDetails = () => {
                     </DialogTrigger>
                     <DialogContent className="overflow-auto p-8 rounded-lg shadow-xl bg-gradient-to-r from-white to-gray-100 transition-all duration-300">
                         <DialogHeader className="mb-4">
-                            <DialogTitle className="text-2xl font-bold text-center text-purple-800">Add New Menu</DialogTitle>
+                            <DialogTitle className="text-2xl font-bold text-center text-indigo-500">Add New Menu</DialogTitle>
                         </DialogHeader>
 
                         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
@@ -342,7 +342,7 @@ const RestaurantDetails = () => {
                 {/* Modal for menu items */}
                 <Dialog open={dialogOpen} onOpenChange={(isOpen => {setDialogOpen(isOpen); if(!isOpen){resetMenuForm()}})}>
                     <DialogTrigger>
-                        <Button className="bg-gradient-to-l from-indigo-500 to-indigo-950">
+                        <Button className={` ${menuCategories.length === 0 ? "hidden" : ""} bg-gradient-to-l from-indigo-500 to-indigo-950`}>
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
                         </Button>
                     </DialogTrigger>
