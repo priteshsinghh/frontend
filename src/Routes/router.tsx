@@ -17,6 +17,7 @@ import ChangePassword from "../pages/home/changePassword";
 import SellerLayout from "../components/seller/layout";
 import SellerDashboard from "../pages/seller/dashboard";
 import RestaurantDetails from "../pages/seller/restaurant-details";
+import MenuItems from "../pages/home/menuItems";
 
 
 const routesConfig = [
@@ -56,6 +57,7 @@ const routesConfig = [
         ),
         children: [
             { path: "home", element: <Home /> },
+            { path: "menu-items", element: <MenuItems /> },
             { path: "profile", element: <ProfilePage /> },
             { path: "get-profile", element: <EditProfile /> },
             { path: "change-password", element: <ChangePassword /> },

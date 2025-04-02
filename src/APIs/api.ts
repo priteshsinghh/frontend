@@ -16,7 +16,7 @@ export const registerUser = async (formData) => {
     return response.data;
 };
 
-export const loginUser = async (payload) => {
+export const loginUser = async (payload: { email: string; password: string; phoneNumber?: undefined; } | { phoneNumber: string; password: string; email?: undefined; }) => {
 
     const response = await axios.post('http://localhost:5001/auth/login',
         payload,
@@ -26,7 +26,7 @@ export const loginUser = async (payload) => {
     return response;
 };
 
-export const forgetPassword = async (email) => {
+export const forgetPassword = async (email: { email: string; }) => {
 
     const response = await axios.post('http://localhost:5001/auth/forget-password',
         email
@@ -35,7 +35,7 @@ export const forgetPassword = async (email) => {
     return response;
 };
 
-export const resetPassword = async (resetData) => {
+export const resetPassword = async (resetData: { token: string | null; newPassword: string; }) => {
 
     const response = await axios.post('http://localhost:5001/auth/reset-password',
         resetData
@@ -62,7 +62,7 @@ export const editProfile = async ({ formData, user }) => {
 
 };
 
-export const editProfilePic = async (formData) => {
+export const editProfilePic = async (formData: FormData) => {
 
     const response = await axios.post("http://localhost:5001/shop/edit-profilepic",
         formData,
@@ -85,7 +85,7 @@ export const changePassword = async ({ formData, user }) => {
 }
 
 
-export const addRestaurant = async (formData) => {
+export const addRestaurant = async (formData: FormData) => {
     const response = await axios.post("http://localhost:5001/seller/add-restaurant",
         formData,
         {
@@ -102,14 +102,14 @@ export const fetchRestaurant = async () => {
     return response;
 }
 
-export const fetchRestaurantDetails = async (id) => {
+export const fetchRestaurantDetails = async (id: string | undefined) => {
     const response = await axios.get(`http://localhost:5001/seller/get-restaurant?id=${id}`,
     );
 
     return response;
 }
 
-export const deleteRestaurant = async (id) => {
+export const deleteRestaurant = async (id: any) => {
     const response = await axios.delete(`http://localhost:5001/seller/delete-restaurant?id=${id}`,
     );
 
@@ -139,7 +139,7 @@ export const editCategory = async({id, name}) => {
 }
 
 
-export const fetchCategories = async (id) => {
+export const fetchCategories = async (id: string | null) => {
     const response = await axios.get(`http://localhost:5001/seller/fetch-category?id=${id}`
     );
 
@@ -148,7 +148,7 @@ export const fetchCategories = async (id) => {
 }
 
 
-export const addMenuItem = async (payload) => {
+export const addMenuItem = async (payload: any) => {
     const response = await axios.post("http://localhost:5001/seller/add-menuItem",
         payload,
         {
@@ -163,13 +163,13 @@ export const addMenuItem = async (payload) => {
 }
 
 
-export const fetchMenu = async (id) => {
+export const fetchMenu = async (id: string | undefined) => {
     const response = await axios.get(`http://localhost:5001/seller/fetch-menu?id=${id}`);
     return response;
 }
 
 
-export const editMenu = async (formData) => {
+export const editMenu = async (formData: FormData) => {
     const response = await axios.put(`http://localhost:5001/seller/edit-menu`,
         formData,
         {
@@ -184,12 +184,12 @@ export const editMenu = async (formData) => {
 }
 
 
-export const deleteCategory = async (id) => {
+export const deleteCategory = async (id: any) => {
     const response = await axios.delete(`http://localhost:5001/seller/delete-category?id=${id}`);
 
     return response;
 }
-export const deleteMenuItem = async (id) => {
+export const deleteMenuItem = async (id: any) => {
     const response = await axios.delete(`http://localhost:5001/seller/delete-menu?id=${id}`);
 
     return response;
