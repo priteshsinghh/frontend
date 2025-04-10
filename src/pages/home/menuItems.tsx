@@ -107,55 +107,112 @@ const MenuItems = () => {
         )}
       </div>
 
-      <div className="container p-6 lg:px-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        {/* Menu Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-serif font-bold text-gray-900 mb-2">
+            Our Menu
+          </h1>
+          <div className="w-24 h-1 bg-amber-500 mx-auto mb-6"></div>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Seasonal offerings crafted with locally-sourced ingredients
+          </p>
+        </div>
+
+        {/* Menu Categories */}
+        <div className="grid gap-12">
           {menuCategories.length > 0 ? (
             menuCategories.map((category) => (
-              <div
-                key={category.category_id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
-              >
-                <div className="flex items-center justify-between bg-indigo-500 text-white px-4 py-2 uppercase font-serif italic">
-                  {category.name}
+              <section key={category.category_id} className="relative">
+                {/* Category Header with decorative elements */}
+                <div className="flex items-center mb-8">
+                  <div className="flex-grow border-t border-amber-200"></div>
+                  <h2 className="px-4 text-2xl font-bold text-gray-800 text-center uppercase font-mono">
+                    {category.name}
+                  </h2>
+                  <div className="flex-grow border-t border-amber-200"></div>
                 </div>
-                <ul className="divide-y divide-gray-200">
+
+                {/* Menu Items Grid */}
+                <div className="grid md:grid-cols-3 gap-8">
                   {category.menu_items.length === 0 ? (
-                    <li className="p-4 text-gray-500">No items available</li>
+                    <div className="col-span-2 text-center py-12 text-gray-500 italic">
+                      Coming soon - new dishes in development
+                    </div>
                   ) : (
                     category.menu_items.map((item) => (
-                      <li
+                      <div
                         key={item.menuItem_id}
-                        className="p-4 flex justify-between items-start"
+                        className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
                       >
-                        <div>
-                          <h2 className="text-md font-semibold uppercase font-mono text-gray-800 italic">
-                            {item.name}
-                          </h2>
-                          <p className="text-sm text-gray-600">
-                            {item.description}
-                          </p>
+                        <div className="flex flex-col h-full cursor-pointer">
+                          {/* Item Image with hover effect */}
+                          {item.image && (
+                            <div className="relative overflow-hidden h-48">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                            </div>
+                          )}
+
+                          {/* Item Details */}
+                          <div className="p-6 flex flex-col flex-grow">
+                            <div className="flex justify-between items-start mb-2">
+                              <h3 className="text-xl font-serif font-bold text-gray-800">
+                                {item.name}
+                              </h3>
+                              <span className="text-lg font-medium text-amber-600 whitespace-nowrap ml-4">
+                                ₹{item.price}
+                              </span>
+                            </div>
+
+                            {item.quantity && (
+                              <div className="text-sm text-amber-700 mb-3 font-medium">
+                                {item.quantity}
+                              </div>
+                            )}
+
+                            {item.description && (
+                              <p className="text-gray-600 mt-2 mb-4 flex-grow">
+                                {item.description}
+                              </p>
+                            )}
+
+                            {/* Dietary Tags */}
+                            {item.tags && (
+                              <div className="flex flex-wrap gap-2 mt-4">
+                                {item.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex flex-col fle">
-                          <span className="text-md font-semibold text-gray-800 font-mono">
-                            ₹{item.price}
-                          </span>
-                          <span className="text-sm text-gray-800">
-                            {item.quantity}
-                          </span>
-                        </div>
-                        <div>
-                            <img 
-                            src={item.image} 
-                            alt="item image" />
-                        </div>
-                      </li>
+                      </div>
                     ))
                   )}
-                </ul>
-              </div>
+                </div>
+              </section>
             ))
           ) : (
-            <p className="text-gray-500">No Menu Available.</p>
+            <div className="text-center py-20">
+              <div className="text-5xl mb-4">🍴</div>
+              <h3 className="text-2xl font-serif text-gray-800 mb-2">
+                Menu Coming Soon
+              </h3>
+              <p className="text-gray-600 max-w-md mx-auto">
+                We're currently curating an exceptional dining experience for
+                you. Please check back later.
+              </p>
+            </div>
           )}
         </div>
       </div>

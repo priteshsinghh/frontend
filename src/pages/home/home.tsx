@@ -9,7 +9,6 @@ import {
   MapPin,
   PaletteIcon,
   Phone,
-  Utensils,
   Wallet,
 } from "lucide-react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -20,8 +19,9 @@ import "swiper/css/pagination";
 import React, { useEffect, useState } from "react";
 import { fetchRestaurant } from "../../APIs/api";
 import { Card, CardContent } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
+// import { Button } from "../../components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Separator } from "../../components/ui/separator";
 
 interface Dish {
   id: number;
@@ -249,9 +249,9 @@ const Home: React.FC = () => {
       </div>
 
       {/* Restaurant Section */}
-      <section className="px-20">
+      <section className="px-20 mb-20">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold italic">Popular Restaurants</h2>
+          <h2 className="text-3xl font-bold">Popular Restaurants</h2>
         </div>
         <div className="flex items-center justify-center">
           {restaurants.length === 0 ? (
@@ -276,7 +276,7 @@ const Home: React.FC = () => {
                     navigate(`/shop/menu-items?id=${restaurant.restaurant_id}`)
                   }
                   key={index}
-                  className="rounded-2xl cursor-pointer overflow-hidden shadow-lg transition-transform transform hover:scale-[1.03] hover:shadow-2xl bg-white"
+                  className=" items-center rounded-2xl cursor-pointer overflow-hidden shadow-lg transition-transform transform hover:scale-[1.03] hover:shadow-2xl"
                 >
                   {/* Image Section with Overlay */}
                   <div className="relative w-full h-48">
@@ -322,8 +322,7 @@ const Home: React.FC = () => {
 
                     <div className="flex flex-col my-2">
                       <p className="flex items-center gap-1">
-                        <Utensils size={18} className="text-red-500" />
-                        <span> {restaurant.cuisineType}</span>
+                        <span className="flex flex-wrap"> {restaurant.cuisineType}</span>
                       </p>
                       <p className="text-gray-600 text-sm">
                         {restaurant.description}
@@ -335,7 +334,9 @@ const Home: React.FC = () => {
             </div>
           )}
         </div>
-      </section>
+      </section>  
+
+      <Separator/>
 
       <section className="py-10 bg-white">
         <div className="text-center mb-8">
@@ -380,9 +381,9 @@ const Home: React.FC = () => {
                     {dish.description}
                   </p>
                   <h1 className="text-center font-bold text-4xl text-red-500 my-4">
-                    ${dish.price}
+                    ₹{dish.price}
                   </h1>
-                  <button
+                  {/* <button
                     type="submit"
                     className="bg-green-500 rounded-lg py-2 px-4"
                   >
@@ -390,7 +391,7 @@ const Home: React.FC = () => {
                   </button>
                   <button className="text-red-500 font-bold my-4">
                     Read More
-                  </button>
+                  </button> */}
                 </div>
               </SwiperSlide>
             ))}
