@@ -17,7 +17,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import React, { useEffect, useState } from "react";
-import { fetchRestaurant } from "../../APIs/api";
+import { fetchRestaurant, fetchMenu } from "../../APIs/api";
 import { Card, CardContent } from "../../components/ui/card";
 // import { Button } from "../../components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -29,77 +29,12 @@ interface Dish {
   image: string;
   description: string;
   price: number;
+  restaurantId: string; // Add this
 }
-
-const dishes: Dish[] = [
-  {
-    id: 1,
-    name: "Grilled Steak with Asparagus",
-    image: "/menu1.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12, // Replace with real URLs
-  },
-  {
-    id: 2,
-    name: "Chicken Soup",
-    image: "/menu_2.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12,
-  },
-  {
-    id: 3,
-    name: "Healthy Bowl",
-    image: "/menu_3.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12,
-  },
-  {
-    id: 4,
-    name: "Grilled Chicken with Veggies",
-    image: "/menu_4.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12,
-  },
-  {
-    id: 5,
-    name: "Grilled Steak with Asparagus",
-    image: "/menu_5.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12, // Replace with real URLs
-  },
-  {
-    id: 6,
-    name: "Chicken Soup",
-    image: "/menu_6.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12,
-  },
-  {
-    id: 7,
-    name: "Healthy Bowl",
-    image: "/menu_7.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12,
-  },
-  {
-    id: 8,
-    name: "Grilled Chicken with Veggies",
-    image: "/menu_8.png",
-    description:
-      "Nullam laoreet arcu eu massa euismod, quis dictum massa sodales. Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci at, viverra turpis.",
-    price: 12,
-  },
-];
 
 const Home: React.FC = () => {
   const [restaurants, setRestaurants] = useState([]);
+  const [menuItems, setMenuItems] = useState<Dish[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -116,6 +51,43 @@ const Home: React.FC = () => {
       console.error("Error fetching restaurants:", error);
     }
   };
+
+  useEffect(() => {
+    const loadMenuItems = async () => {
+      if (restaurants.length > 0) {
+        try {
+          // Fetch menus for ALL restaurants
+          const menuPromises = restaurants.map(async (restaurant) => {
+            const menuResponse = await fetchMenu(restaurant.restaurant_id);
+            return {
+              restaurantId: restaurant.restaurant_id,
+              categories: menuResponse.data?.categories || [],
+            };
+          });
+
+          const allMenus = await Promise.all(menuPromises);
+
+          // Flatten dishes with restaurantId
+          const items = allMenus.flatMap((menu) =>
+            menu.categories.flatMap((category) =>
+              category.menu_items.map((item) => ({
+                id: item.menuItem_id,
+                name: item.name,
+                image: item.image,
+                description: item.description,
+                price: item.price,
+                restaurantId: menu.restaurantId, // Attach restaurant ID
+              }))
+            )
+          );
+          setMenuItems(items);
+        } catch (error) {
+          console.error("Error fetching menu items:", error);
+        }
+      }
+    };
+    loadMenuItems();
+  }, [restaurants]);
 
   return (
     <>
@@ -322,7 +294,10 @@ const Home: React.FC = () => {
 
                     <div className="flex flex-col my-2">
                       <p className="flex items-center gap-1">
-                        <span className="flex flex-wrap"> {restaurant.cuisineType}</span>
+                        <span className="flex flex-wrap">
+                          {" "}
+                          {restaurant.cuisineType}
+                        </span>
                       </p>
                       <p className="text-gray-600 text-sm">
                         {restaurant.description}
@@ -334,68 +309,63 @@ const Home: React.FC = () => {
             </div>
           )}
         </div>
-      </section>  
+      </section>
 
-      <Separator/>
+      <Separator />
 
       <section className="py-10 bg-white">
         <div className="text-center mb-8">
           <h3 className="text-green-600 text-lg font-medium">Our Menu</h3>
           <h2 className="text-3xl font-bold">Popular Dishes</h2>
           <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
-            Nullam laoreet arcu eu massa euismod, quis dictum massa sodales.
-            Proin eget scelerisque dui. Phasellus id enim lobortis, porta orci
-            at, viverra turpis.
+            Explore delicious dishes from our featured restaurants.
           </p>
         </div>
 
         <div className="px-6 lg:px-12">
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            spaceBetween={28}
-            slidesPerView={1}
-            navigation
-            pagination={{ clickable: true }}
-            autoplay={{
-              delay: 3000, // 3 seconds
-              disableOnInteraction: false,
-            }}
-            breakpoints={{
-              640: { slidesPerView: 1 },
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 4 },
-            }}
-          >
-            {dishes.map((dish) => (
-              <SwiperSlide key={dish.id}>
-                <div className="flex flex-col items-center">
-                  <img
-                    src={dish.image}
-                    alt={dish.name}
-                    className="rounded-full w-48 h-48 object-cover my-4 shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
-                  />
-                  <h2 className="font-bold text-2xl text-gray-700 text-center cursor-pointer hover:text-green-500">
-                    {dish.name}
-                  </h2>
-                  <p className="text-gray-500 mt-2 text-center">
-                    {dish.description}
-                  </p>
-                  <h1 className="text-center font-bold text-4xl text-red-500 my-4">
-                    ₹{dish.price}
-                  </h1>
-                  {/* <button
-                    type="submit"
-                    className="bg-green-500 rounded-lg py-2 px-4"
+          {menuItems.length === 0 ? (
+            <p className="text-center">Loading menu items...</p>
+          ) : (
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={28}
+              slidesPerView={1}
+              navigation
+              pagination={{ clickable: true }}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+              }}
+              breakpoints={{
+                640: { slidesPerView: 1 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 4 },
+              }}
+            >
+              {menuItems.map((dish) => (
+                <SwiperSlide key={dish.id}>
+                  <div
+                    className="flex flex-col items-center cursor-pointer"
+                    onClick={() =>
+                      navigate(`/shop/menu-items?id=${dish.restaurantId}`)
+                    }
                   >
-                    Add to Cart
-                  </button>
-                  <button className="text-red-500 font-bold my-4">
-                    Read More
-                  </button> */}
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                    <img
+                      src={dish.image || "/placeholder-dish.png"} // Fallback image
+                      alt={dish.name}
+                      className="rounded-full w-48 h-48 object-cover my-4 shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
+                    />
+                    <h2 className="font-bold text-2xl text-gray-700 text-center cursor-pointer hover:text-green-500">
+                      {dish.name}
+                    </h2>
+                    <p className="text-gray-500 mt-2 text-center">
+                      {dish.description}
+                    </p>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </div>
       </section>
     </>

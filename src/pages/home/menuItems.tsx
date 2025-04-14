@@ -51,6 +51,7 @@ const MenuItems = () => {
   const loadCategories = async () => {
     try {
       const response = await fetchCategories(id);
+      return response
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
