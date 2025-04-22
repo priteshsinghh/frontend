@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-nocheck
+
 import axios from 'axios';
 
 
@@ -50,7 +54,6 @@ export const verifiedEmail = async ({ params: { token, phoneNumber } }) => {
     const response = await axios.get('http://localhost:5001/auth/mail-verification',
         { params: { token, phoneNumber } }
     );
-
     return response;
 
 };

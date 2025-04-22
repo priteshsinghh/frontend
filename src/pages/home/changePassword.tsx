@@ -95,7 +95,7 @@ const ChangePassword: React.FC = () => {
                             htmlFor="confirmPassword"
                             className="block text-sm font-medium text-black"
                         >
-                            Current Password
+                            Confirm Password
                         </label>
                         <input
                             type="password"

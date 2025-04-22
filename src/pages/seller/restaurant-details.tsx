@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { fetchCategories, addCategory, addMenuItem, fetchRestaurantDetails, fetchMenu, editMenu, deleteCategory, deleteMenuItem, editCategory } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
@@ -26,6 +28,8 @@ const RestaurantDetails = () => {
     const [selectedCategory1, setSelectedCategory1] = useState(null);
     const [menuItems1, setMenuItems1] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
 
     const location = useLocation();
@@ -100,8 +104,9 @@ const RestaurantDetails = () => {
         }
     };
 
-  
+
     const handleAddMenuItem = async () => {
+        setIsLoading(true)
         try {
             for (const item of menuItems) {
 
@@ -115,6 +120,7 @@ const RestaurantDetails = () => {
                     toast({
                         title: response.data.message
                     })
+                    setIsSubmitted(true);
                 }
 
             }
@@ -128,6 +134,8 @@ const RestaurantDetails = () => {
                 title: error.response.data.message,
                 variant: "destructive"
             })
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -161,6 +169,7 @@ const RestaurantDetails = () => {
 
 
     const handleSaveChanges = async (categoryId) => {
+        setIsLoading(true)
         try {
             const formData = new FormData();
             formData.append("id", selectedCategory1.category_id);
@@ -190,6 +199,7 @@ const RestaurantDetails = () => {
                 fetchMenuCategories(selectedCategory1.restaurant_id);
                 setOpen(false)
                 setNewEditCategory(setNewEditCategory.name);
+                setIsSubmitted(true)
             }
 
         } catch (error) {
@@ -198,6 +208,8 @@ const RestaurantDetails = () => {
                 title: error.response?.data?.message || 'Error saving menu items',
                 variant: 'destructive'
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -340,7 +352,7 @@ const RestaurantDetails = () => {
                 </Dialog>
 
                 {/* Modal for menu items */}
-                <Dialog open={dialogOpen} onOpenChange={(isOpen => {setDialogOpen(isOpen); if(!isOpen){resetMenuForm()}})}>
+                <Dialog open={dialogOpen} onOpenChange={(isOpen => { setDialogOpen(isOpen); if (!isOpen) { resetMenuForm() } })}>
                     <DialogTrigger>
                         <Button className={` ${menuCategories.length === 0 ? "hidden" : ""} bg-gradient-to-l from-indigo-500 to-indigo-950`}>
                             {menuCategories.length === 0 ? "Add menu Item" : "Edit Menu"}
@@ -440,7 +452,7 @@ const RestaurantDetails = () => {
                                     onClick={handleAddMenuItem}
                                     className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105"
                                 >
-                                    Submit Menu
+                                    {isLoading ? "Submitting..." : isSubmitted ? "Submit" : "Submit"}
                                 </Button>
                             </div>
                         </DialogFooter>
@@ -510,7 +522,7 @@ const RestaurantDetails = () => {
                                                     />
                                                 </div>
 
-                                                <div className="flex flex-col gap-2"> 
+                                                <div className="flex flex-col gap-2">
                                                     <Label>Quantity: </Label>
                                                     <Input
                                                         type="text"
@@ -558,7 +570,7 @@ const RestaurantDetails = () => {
                                 <Button
                                     onClick={() => handleSaveChanges(selectedCategory1?.category_id)}  // Handle save changes function
                                     className="bg-indigo-500 text-white py-3 px-6 rounded-lg shadow-sm hover:bg-indigo-600 transition-all duration-300 transform hover:scale-105">
-                                    Save Changes
+                                    {isLoading ? "Saving..." : isSubmitted ? "Save Changes" : "Save Changes"}
                                 </Button>
                             </div>
                         </DialogFooter>

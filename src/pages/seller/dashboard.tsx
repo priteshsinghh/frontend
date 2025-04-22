@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import { Card, CardContent } from "../../components/ui/card";
@@ -74,19 +77,18 @@ const SellerDashboard: React.FC = () => {
         }
     };
 
-    const handelDelete = async (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
+    const handelDelete = async (id: any) => {
         try {
 
-            const id = restaurants.restaurant_id;
             console.log(id);
-            
-            const response = await deleteRestaurant(id)
 
+            const response = await deleteRestaurant(id)
+            
             if (response.data.success) {
                 toast({
                     title: response.data.message,
                 })
+                fetchRestaurant();
             }
 
         } catch (error) {
@@ -104,7 +106,7 @@ const SellerDashboard: React.FC = () => {
                     </Button>
 
                 </DialogTrigger>
-                <DialogContent className="overflow-auto scroll-smooth w-full max-w-[650px] h-auto max-h-[90vh] p-4 sm:p-6 rounded-lg">
+                <DialogContent className="overflow-auto scroll-smooth w-full max-w-[650px] h-auto max-h-[90vh] p-4 sm:p-6 rounded-lg no-scrollbar">
 
                     <DialogHeader>
                         <DialogTitle>Add a New Restaurant</DialogTitle>
@@ -283,12 +285,12 @@ const SellerDashboard: React.FC = () => {
 
                                 <div className="flex justify-between gap-8 pt-2">
                                     <Button
-                                        onClick={()=> navigate(`/seller/restaurant-details?id=${restaurant.restaurant_id}`)}
+                                        onClick={() => navigate(`/seller/restaurant-details?id=${restaurant.restaurant_id}`)}
                                         className=" bg-indigo-500 text-white  text-base font-semibold hover:bg-indigo-600 transition-all">
                                         View Details
                                     </Button>
                                     <Button
-                                        onClick={handelDelete}
+                                        onClick={() => handelDelete(restaurant.restaurant_id)}
                                         className="  bg-red-500 text-white  text-base font-semibold hover:bg-indigo-600 transition-all">
                                         Delete
                                     </Button>

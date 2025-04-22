@@ -11,7 +11,7 @@ const ProfilePage: React.FC = () => {
     const { user } = useSelector((state: any) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const {toast} = useToast();
+    const { toast } = useToast();
     const [imagePreview, setImagePreview] = useState(user.profilePic);
 
     // Handle Edit Profile Navigation
@@ -38,7 +38,7 @@ const ProfilePage: React.FC = () => {
                         title: response.data.message,
                     });
                     dispatch(updateUser({ ...user, profilePic: response.data.profilePic })); // Update Redux
-                }else{
+                } else {
                     toast({
                         title: response.data.message,
                         variant: "destructive"
@@ -81,10 +81,12 @@ const ProfilePage: React.FC = () => {
                     <div className="flex flex-col">
                         <h1 className="text-3xl font-semibold text-gray-800 mb-2">{user.userName}</h1>
                         <div className="flex justify-between gap-2 items-center mb-2">
-                            <p className="text-gray-500 text-lg">Email: {user.email}</p>
-                            <p className={`text-lg ${user.isVerified === 1 ? "text-green-500" : "text-red-500"}`}>
-                                <VerifiedIcon size={20}/>
+                            <p className="text-gray-500 text-lg flex items-center gap-3">Email: {user.email}
+                                <span className={`text-lg ${user.isVerified === 1 ? "text-green-500" : "text-red-500"}`}>
+                                    <VerifiedIcon size={20} />
+                                </span>
                             </p>
+
                         </div>
                         <p className="text-gray-500 text-lg mb-2">Phone No: {user.phoneNumber}</p>
                         <p className="text-gray-500 text-lg mb-4">Gender: {user.gender}</p>
