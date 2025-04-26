@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable react-hooks/exhaustive-deps */
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import {
   fetchCategories,
@@ -7,10 +9,13 @@ import {
 } from "../../APIs/api";
 import { useLocation } from "react-router-dom";
 import { MapPin, PhoneCall } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../store/cartSlice";
 
 const MenuItems = () => {
   const [restaurants, setRestaurants] = useState("");
   const [menuCategories, setMenuCategories] = useState("");
+  const dispatch = useDispatch();
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -51,7 +56,7 @@ const MenuItems = () => {
   const loadCategories = async () => {
     try {
       const response = await fetchCategories(id);
-      return response
+      return response;
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -195,6 +200,23 @@ const MenuItems = () => {
                                 ))}
                               </div>
                             )}
+                            <div className="mt-4">
+                              <button
+                                onClick={() =>
+                                  dispatch(
+                                    addToCart({
+                                      id: item.menuItem_id,
+                                      name: item.name,
+                                      price: item.price,
+                                      image: item.image,
+                                    })
+                                  )
+                                }
+                                className="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 rounded transition-colors"
+                              >
+                                Add to Cart
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

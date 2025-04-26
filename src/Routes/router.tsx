@@ -1,4 +1,3 @@
-
 // import { Navigate } from "react-router-dom";
 import AuthLayout from "../components/auth/layout";
 import Login from "../pages/auth/login";
@@ -19,56 +18,53 @@ import SellerDashboard from "../pages/seller/dashboard";
 import RestaurantDetails from "../pages/seller/restaurant-details";
 import MenuItems from "../pages/home/menuItems";
 
-
 const routesConfig = [
-    {
-        path: "/",
-        element: <Navigate to="auth/login" />,
-    },
-    {
-        path: "/auth",
-        element:  <AuthLayout />,
-        children: [
-            { path: "login", element: <Login /> },
-            { path: "register", element: <Register /> },
-            { path: "mail-verification", element: <EmailVerification /> },
-            { path: "forget-password", element: <ForgetPassword /> },
-            { path: "reset-password", element: <ResetPassword /> },
-        ],
-    },
-    {
-        path: "/seller",
-        element: (
-            <ProtectedRoute allowedRoles={["seller"] }>
-                <SellerLayout />
-            </ProtectedRoute>
-        ),
-        children: [
-            { path: "dashboard", element: <SellerDashboard /> },
-            { path: "restaurant-details", element: <RestaurantDetails /> },
-        ],
-    },
-    {
-        path: "/shop",
-        element: (
-            <ProtectedRoute allowedRoles={["buyer"]}>
-                <ShoppingLayout />
-            </ProtectedRoute>
-        ),
-        children: [
-            { path: "home", element: <Home /> },
-            { path: "menu-items", element: <MenuItems /> },
-            { path: "profile", element: <ProfilePage /> },
-            { path: "get-profile", element: <EditProfile /> },
-            { path: "change-password", element: <ChangePassword /> },
-        ],
-        
-    },
-    {
-        path: "*",
-        element: <NotFound />,
-    },
+  {
+    path: "/",
+    element: <Navigate to="auth/login" />,
+  },
+  {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "mail-verification", element: <EmailVerification /> },
+      { path: "forget-password", element: <ForgetPassword /> },
+      { path: "reset-password", element: <ResetPassword /> },
+    ],
+  },
+  {
+    path: "/seller",
+    element: (
+      <ProtectedRoute allowedRoles={["seller"]}>
+        <SellerLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: "dashboard", element: <SellerDashboard /> },
+      { path: "restaurant-details", element: <RestaurantDetails /> },
+    ],
+  },
+  {
+    path: "/shop",
+    element: (
+      <ProtectedRoute allowedRoles={["buyer"]}>
+        <ShoppingLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { path: "home", element: <Home /> },
+      { path: "menu-items", element: <MenuItems /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "get-profile", element: <EditProfile /> },
+      { path: "change-password", element: <ChangePassword /> }
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
 ];
-
 
 export default routesConfig;

@@ -1,21 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+//ts-nocheck
 
-import { LogOut, User2Icon } from 'lucide-react';
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-
+import { LogOut, ShoppingCartIcon, User2Icon } from "lucide-react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toggleCart } from "../../store/cartSlice";
 
 const Header: React.FC = () => {
-
-
   const { isAuthenticated, user } = useSelector((state: any) => state.auth);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const cartItems = useSelector((state: any) => state.cart.items);
+  const itemCount = cartItems.reduce(
+    (count: number, item: any) => count + item.quantity,
+    0
+  );
 
   function handleLogout() {
     localStorage.clear();
-    navigate("/auth/login")
+    navigate("/auth/login");
   }
 
   function handleLogin() {
@@ -23,8 +29,8 @@ const Header: React.FC = () => {
   }
 
   function handleNavigate() {
-    navigate("/shop/profile")
-    setDropdownOpen(!dropdownOpen)
+    navigate("/shop/profile");
+    setDropdownOpen(!dropdownOpen);
   }
 
   return (
@@ -43,7 +49,10 @@ const Header: React.FC = () => {
       {/* Navigation Links */}
       <ul className="hidden md:flex space-x-6 text-gray-700 font-semibold">
         <li>
-          <a href="/shop/home" className="text-green-500 font-semibold hover:text-green-500">
+          <a
+            href="/shop/home"
+            className="text-green-500 font-semibold hover:text-green-500"
+          >
             Home
           </a>
         </li>
@@ -81,39 +90,68 @@ const Header: React.FC = () => {
 
       {/* Get Menu Button */}
 
-      <div className='flex justify-center gap-4 relative'>
+      <div className="flex justify-center gap-4 relative">
+        <div
+          className="hidden md:flex items-center justify-center bg-green-500 text-white px-4 py-2 rounded-lg cursor-pointer relative"
+          onClick={() => dispatch(toggleCart())}
+        >
+          <ShoppingCartIcon />
+          {itemCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+              {itemCount}
+            </span>
+          )}
+        </div>
+
         {/* Profile Picture */}
         <img
           src={user.profilePic}
           className="object-cover w-[40px] h-[40px] rounded-full cursor-pointer"
-          onClick={() => setDropdownOpen(!dropdownOpen)}  // Toggle dropdown on image click
+          onClick={() => setDropdownOpen(!dropdownOpen)} // Toggle dropdown on image click
           alt="Profile"
         />
-        <h1 className='flex items-center cursor-pointer' onClick={() => setDropdownOpen(!dropdownOpen)}>{user.userName}</h1>
+        <h1
+          className="flex items-center cursor-pointer"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
+          {user.userName}
+        </h1>
 
         {/* Dropdown Menu */}
         {dropdownOpen && (
           <div className="absolute mt-16 mr-4 w-50 bg-white rounded-lg shadow-lg py-1">
-            <div className='cursor-pointer rounded-lg p-2'>
-              <h1 className='text-2xl  cursor-pointer'>Hello, {user.userName.split(" ")[0]}</h1>
-              <p className='text-sm '>{user.email}</p>
+            <div className="cursor-pointer rounded-lg p-2">
+              <h1 className="text-2xl  cursor-pointer">
+                Hello, {user.userName.split(" ")[0]}
+              </h1>
+              <p className="text-sm ">{user.email}</p>
             </div>
             <hr></hr>
-            <h1 className="flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer" onClick={handleNavigate}>
+            <h1
+              className="flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer"
+              onClick={handleNavigate}
+            >
               <User2Icon /> My Account
             </h1>
             <h1
-              className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? 'hidden' : ''}`}
+              className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${
+                isAuthenticated ? "hidden" : ""
+              }`}
               onClick={handleLogin}
             >
               Login/SignUp
             </h1>
-            <h1 className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${isAuthenticated ? '' : 'hidden'}`} onClick={handleLogout}><LogOut /> Logout</h1>
+            <h1
+              className={`flex gap-2 block px-4 py-2 text-gray-800 hover:bg-indigo-500 hover:text-white cursor-pointer ${
+                isAuthenticated ? "" : "hidden"
+              }`}
+              onClick={handleLogout}
+            >
+              <LogOut /> Logout
+            </h1>
           </div>
         )}
-
       </div>
-
     </nav>
   );
 };
