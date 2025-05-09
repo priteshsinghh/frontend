@@ -101,7 +101,7 @@ const Home: React.FC = () => {
           backgroundImage: "url('/homebg.jpg')", // Replace with the correct image path
         }}
       >
-        <div className="flex flex-wrap items-center justify-end w-[500px] pr-10">
+        <div className="flex flex-wrap items-center justify-end w-[500px]">
           <div className="text-right">
             <span className="block text-6xl text-green-600 font-bold">
               Organic food
